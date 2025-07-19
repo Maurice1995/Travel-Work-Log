@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>GFZ-Rechner Perchtoldsdorf</title>
+  <style>
+    body { font-family: sans-serif; padding: 30px; max-width: 600px; margin: auto; }
+    label, input { display: block; margin: 10px 0; width: 100%; }
+    button { padding: 10px 15px; font-size: 16px; }
+    .result { margin-top: 20px; font-size: 18px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>GFZ-Rechner Perchtoldsdorf</h1>
+  <p>Gib Adresse, Grundstücksfläche, verbaute Fläche und Geschossanzahl ein:</p>
+
+  <label for="adresse">Adresse:</label>
+  <input type="text" id="adresse" placeholder="z.B. Marktplatz 1">
+
+  <label for="grundstück">Grundstücksfläche (m²):</label>
+  <input type="number" id="grundstück" placeholder="z.B. 600" step="0.01">
+
+  <label for="verbaute">Verbaute Fläche (m² pro Geschoss):</label>
+  <input type="number" id="verbaute" placeholder="z.B. 200" step="0.01">
+
+  <label for="geschosse">Anzahl der oberirdischen Geschosse:</label>
+  <input type="number" id="geschosse" placeholder="z.B. 2">
+
+  <button onclick="berechneGFZ()">GFZ berechnen</button>
+
+  <div class="result" id="ergebnis"></div>
+
+  <script>
+  async function berechneGFZ() {
+    const adresse = document.getElementById("adresse").value;
+    const grundstück = parseFloat(document.getElementById("grundstück").value);
+    const verbaute = parseFloat(document.getElementById("verbaute").value);
+    const geschosse = parseFloat(document.getElementById("geschosse").value);
+    const ergebnisDiv = document.getElementById("ergebnis");
+
+    if (!adresse || isNaN(grundstück) || isNaN(verbaute) || isNaN(geschosse) ||
+        grundstück <= 0 || verbaute <= 0 || geschosse <= 0) {
+      ergebnisDiv.innerHTML = "❗ Bitte alle Felder korrekt ausfüllen.";
+      return;
+    }
+
+    const gesamtfläche = verbaute * geschosse;
+    const gfz = (gesamtfläche / grundstück).toFixed(2);
+
+    ergebnisDiv.innerHTML = `📍 Adresse: <strong>${adresse}</strong><br>
+      ✅ GFZ: <strong>${gfz}</strong><br>
+      (zulässig: max. 1,0 im Ortszentrum Perchtoldsdorf)`;
+
+    // Daten an Google Sheet senden
+    const daten = {
+      adresse,
+      grundstück,
+      verbaute,
+      geschosse,
+      gfz
+    };
+
+    try {
+      await fetch("https://script.google.com/macros/s/AKfycbymqTIEtnWFttk3nJEVsM1NLerWFfJcjarQvVpj-9xD_DWRZzXwUdW8JSUSkG_CSXm6/exec", {
+        method: "POST",
+        body: JSON.stringify(daten),
+        headers: { "Content-Type": "application/json" }
+      });
+      console.log("✅ Adresse gespeichert.");
+    } catch (err) {
+      console.error("❌ Fehler beim Speichern:", err);
+    }
+  }
+</script>
+
+</body>
+</html>
