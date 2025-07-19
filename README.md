@@ -1,2 +1,2 @@
-# GFZ-Eintr-ge
+# GFZ-Eintraege
 GFZ-Einträge
