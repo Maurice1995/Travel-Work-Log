@@ -8,70 +8,139 @@
     label, input { display: block; margin: 10px 0; width: 100%; }
     button { padding: 10px 15px; font-size: 16px; }
     .result { margin-top: 20px; font-size: 18px; font-weight: bold; }
+    #save-status { margin-top: 10px; padding: 10px; border-radius: 5px; }
+    .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .loading { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
   </style>
 </head>
 <body>
   <h1>GFZ-Rechner Perchtoldsdorf</h1>
   <p>Gib Adresse, Grundstücksfläche, verbaute Fläche und Geschossanzahl ein:</p>
-
+  
   <label for="adresse">Adresse:</label>
   <input type="text" id="adresse" placeholder="z.B. Marktplatz 1">
-
+  
   <label for="grundstück">Grundstücksfläche (m²):</label>
   <input type="number" id="grundstück" placeholder="z.B. 600" step="0.01">
-
+  
   <label for="verbaute">Verbaute Fläche (m² pro Geschoss):</label>
   <input type="number" id="verbaute" placeholder="z.B. 200" step="0.01">
-
+  
   <label for="geschosse">Anzahl der oberirdischen Geschosse:</label>
   <input type="number" id="geschosse" placeholder="z.B. 2">
-
+  
   <button onclick="berechneGFZ()">GFZ berechnen</button>
-
+  
   <div class="result" id="ergebnis"></div>
 
   <script>
-  async function berechneGFZ() {
+  function berechneGFZ() {
     const adresse = document.getElementById("adresse").value;
     const grundstück = parseFloat(document.getElementById("grundstück").value);
     const verbaute = parseFloat(document.getElementById("verbaute").value);
     const geschosse = parseFloat(document.getElementById("geschosse").value);
     const ergebnisDiv = document.getElementById("ergebnis");
-
+    
+    // Validation
     if (!adresse || isNaN(grundstück) || isNaN(verbaute) || isNaN(geschosse) ||
         grundstück <= 0 || verbaute <= 0 || geschosse <= 0) {
       ergebnisDiv.innerHTML = "❗ Bitte alle Felder korrekt ausfüllen.";
       return;
     }
-
+    
+    // Calculate GFZ
     const gesamtfläche = verbaute * geschosse;
     const gfz = (gesamtfläche / grundstück).toFixed(2);
-
-    ergebnisDiv.innerHTML = `📍 Adresse: <strong>${adresse}</strong><br>
+    
+    // Show result
+    ergebnisDiv.innerHTML = `
+      📍 Adresse: <strong>${adresse}</strong><br>
       ✅ GFZ: <strong>${gfz}</strong><br>
-      (zulässig: max. 1,0 im Ortszentrum Perchtoldsdorf)`;
-
-    // Daten an Google Sheet senden
-    const daten = {
-      adresse,
-      grundstück,
-      verbaute,
-      geschosse,
-      gfz
-    };
-
-    try {
-      await fetch("https://script.google.com/macros/s/AKfycbykcplBLcSuGOZngXuKdZPV10WPccQk4whM5SK_lu6K5LIXVIm9hDhIKF7qJXdE91Mo/exec", {
-        method: "POST",
-        body: JSON.stringify(daten),
-        headers: { "Content-Type": "application/json" }
-      });
-      console.log("✅ Adresse gespeichert.");
-    } catch (err) {
-      console.error("❌ Fehler beim Speichern:", err);
-    }
+      (zulässig: max. 1,0 im Ortszentrum Perchtoldsdorf)
+      <div id="save-status" class="loading">💾 Speichere Daten...</div>
+    `;
+    
+    // Send data using form submission (bypasses CORS)
+    sendDataToSheet(adresse, grundstück, verbaute, geschosse, gfz);
   }
-</script>
-
+  
+  function sendDataToSheet(adresse, grundstück, verbaute, geschosse, gfz) {
+    // Create form
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'https://script.google.com/macros/s/AKfycbxCJLTHhQh5KJwMAi-YKp66JWJAoRvN3soyyWRVISU9n_a4T2AgMK5nu-5X8kF0POi/exec';
+    form.target = 'hidden_iframe';
+    
+    // Create form fields
+    const fields = {
+      adresse: adresse,
+      grundstück: grundstück,
+      verbaute: verbaute,
+      geschosse: geschosse,
+      gfz: parseFloat(gfz)
+    };
+    
+    Object.keys(fields).forEach(key => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = fields[key];
+      form.appendChild(input);
+    });
+    
+    // Create or get hidden iframe
+    let iframe = document.getElementById('hidden_iframe');
+    if (!iframe) {
+      iframe = document.createElement('iframe');
+      iframe.id = 'hidden_iframe';
+      iframe.name = 'hidden_iframe';
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+    }
+    
+    // Handle iframe load (indicates form submission completed)
+    iframe.onload = function() {
+      const saveStatusDiv = document.getElementById("save-status");
+      if (saveStatusDiv) {
+        saveStatusDiv.innerHTML = "✅ Daten erfolgreich gespeichert!";
+        saveStatusDiv.className = "success";
+      }
+      
+      // Clean up form
+      if (form.parentNode) {
+        form.parentNode.removeChild(form);
+      }
+    };
+    
+    // Handle iframe error
+    iframe.onerror = function() {
+      const saveStatusDiv = document.getElementById("save-status");
+      if (saveStatusDiv) {
+        saveStatusDiv.innerHTML = "❌ Fehler beim Speichern";
+        saveStatusDiv.className = "error";
+      }
+    };
+    
+    // Submit form
+    document.body.appendChild(form);
+    
+    // Add timeout fallback
+    setTimeout(function() {
+      const saveStatusDiv = document.getElementById("save-status");
+      if (saveStatusDiv && saveStatusDiv.innerHTML.includes("Speichere")) {
+        saveStatusDiv.innerHTML = "✅ Daten gesendet (Status unbekannt)";
+        saveStatusDiv.className = "success";
+      }
+      
+      // Clean up form
+      if (form.parentNode) {
+        form.parentNode.removeChild(form);
+      }
+    }, 3000);
+    
+    form.submit();
+  }
+  </script>
 </body>
 </html>
