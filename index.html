@@ -52,6 +52,46 @@
       opacity: 1;
     }
     
+    .info-section {
+      background: linear-gradient(135deg, rgba(244, 228, 188, 0.3), rgba(255, 248, 231, 0.5));
+      border: 1px solid rgba(212, 165, 116, 0.3);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 32px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    
+    .info-header {
+      font-weight: 700;
+      font-size: 16px;
+      color: #8B5A3C;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    
+    .info-content {
+      color: #4a5568;
+    }
+    
+    .info-item {
+      margin-bottom: 12px;
+      padding-left: 8px;
+    }
+    
+    .info-item strong {
+      color: #8B5A3C;
+    }
+    
+    .info-note {
+      background: rgba(139, 90, 60, 0.1);
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 16px;
+      font-weight: 500;
+      color: #8B5A3C;
+    }
+    
     h1 {
       font-size: 2.2em;
       font-weight: 700;
@@ -322,6 +362,28 @@
     </button>
     
     <div class="result" id="ergebnis"></div>
+    
+    <!-- Information Section -->
+    <div class="info-section">
+      <div class="info-header">📚 So messen Sie richtig</div>
+      <div class="info-content">
+        <div class="info-item">
+          <strong>📍 Adresse:</strong> Einfach die genaue Adresse Ihres Grundstücks eingeben.
+        </div>
+        <div class="info-item">
+          <strong>📐 Grundstücksfläche:</strong> Die Gesamtfläche Ihres Grundstücks in m². Diese finden Sie im <strong>Grundbuch</strong> oder können sie mit einem Maßband nachmessen.
+        </div>
+        <div class="info-item">
+          <strong>🏗️ Verbaute Fläche pro Geschoss:</strong> Die Außenmaße des Gebäudes pro Geschoss (inkl. Außenwände). <strong>Tipp:</strong> Im Grundbuch oft als "verbaute Fläche" eingetragen - diese Angabe kann aber ungenau sein.
+        </div>
+        <div class="info-item">
+          <strong>🏢 Anzahl Geschosse:</strong> Nur <strong>Vollgeschosse</strong> zählen (meist Erdgeschoss + Obergeschosse). Keller und nicht ausgebaute Dachböden zählen normalerweise nicht dazu.
+        </div>
+        <div class="info-note">
+          💡 <strong>Hinweis:</strong> Die Angaben im Grundbuch sind ein guter Ausgangspunkt, aber für genaue Berechnungen sollten Sie selbst nachmessen oder einen Fachmann beauftragen.
+        </div>
+      </div>
+    </div>
     
     <div class="disclaimer">
       <div class="disclaimer-title">🔒 Datenschutzhinweis</div>
