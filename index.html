@@ -1,567 +1,545 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GFZ-Rechner Perchtoldsdorf</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: 
-        linear-gradient(rgba(139, 90, 60, 0.3), rgba(139, 90, 60, 0.3)),
-        url('https://static.wixstatic.com/media/0dccc6_95336b72e31f48f3809ca57502afe59c~mv2.jpg/v1/fill/w_1225,h_1238,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/0dccc6_95336b72e31f48f3809ca57502afe59c~mv2.jpg') center center / cover no-repeat;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      position: relative;
-    }
-    
-    .container {
-      background: rgba(255, 255, 255, 0.98);
-      backdrop-filter: blur(15px);
-      border-radius: 24px;
-      padding: 40px;
-      max-width: 480px;
-      width: 100%;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      position: relative;
-    }
-    
-    .logo-container {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-    
-    .logo {
-      height: 60px;
-      width: auto;
-      opacity: 0.9;
-      transition: opacity 0.3s ease;
-    }
-    
-    .logo:hover {
-      opacity: 1;
-    }
-    
-    .info-section {
-      background: linear-gradient(135deg, rgba(244, 228, 188, 0.3), rgba(255, 248, 231, 0.5));
-      border: 1px solid rgba(212, 165, 116, 0.3);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 32px;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-    
-    .info-header {
-      font-weight: 700;
-      font-size: 16px;
-      color: #8B5A3C;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-    
-    .info-content {
-      color: #4a5568;
-    }
-    
-    .info-item {
-      margin-bottom: 12px;
-      padding-left: 8px;
-    }
-    
-    .info-item strong {
-      color: #8B5A3C;
-    }
-    
-    .info-note {
-      background: rgba(139, 90, 60, 0.1);
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 16px;
-      font-weight: 500;
-      color: #8B5A3C;
-    }
-    
-    .info-link {
-      color: #8B5A3C;
-      text-decoration: underline;
-      font-weight: 600;
-      transition: color 0.3s ease;
-    }
-    
-    .info-link:hover {
-      color: #D4A574;
-      text-decoration: none;
-    }
-    
-    h1 {
-      font-size: 2.2em;
-      font-weight: 700;
-      color: #2d3748;
-      margin-bottom: 8px;
-      text-align: center;
-      background: linear-gradient(135deg, #8B5A3C, #D4A574);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .subtitle {
-      color: #718096;
-      text-align: center;
-      margin-bottom: 32px;
-      font-weight: 400;
-    }
-    
-    .form-group {
-      margin-bottom: 24px;
-    }
-    
-    label {
-      display: block;
-      color: #4a5568;
-      font-weight: 600;
-      margin-bottom: 8px;
-      font-size: 0.95em;
-    }
-    
-    input {
-      width: 100%;
-      padding: 16px 20px;
-      border: 2px solid #e2e8f0;
-      border-radius: 12px;
-      font-size: 16px;
-      background: #f8fafc;
-      transition: all 0.3s ease;
-      color: #2d3748;
-    }
-    
-    input:focus {
-      outline: none;
-      border-color: #D4A574;
-      background: #fff;
-      box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
-      transform: translateY(-1px);
-    }
-    
-    input::placeholder {
-      color: #a0aec0;
-    }
-    
-    .calculate-btn {
-      width: 100%;
-      background: linear-gradient(135deg, #8B5A3C, #D4A574);
-      color: white;
-      padding: 18px 24px;
-      border: none;
-      border-radius: 12px;
-      font-size: 18px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin: 32px 0 24px 0;
-    }
-    
-    .calculate-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(139, 90, 60, 0.3);
-    }
-    
-    .calculate-btn:active {
-      transform: translateY(0);
-    }
-    
-    .result {
-      background: linear-gradient(135deg, #F4E4BC 0%, #FFF8E7 100%);
-      border: 2px solid #D4A574;
-      border-radius: 16px;
-      padding: 24px;
-      margin-top: 24px;
-      font-size: 16px;
-      line-height: 1.6;
-      display: none;
-    }
-    
-    .result.show {
-      display: block;
-      animation: slideIn 0.4s ease-out;
-    }
-    
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .result-item {
-      margin-bottom: 12px;
-    }
-    
-    .result-item:last-child {
-      margin-bottom: 0;
-    }
-    
-    .highlight {
-      color: #2d3748;
-      font-weight: 700;
-    }
-    
-    .gfz-value {
-      font-size: 1.2em;
-      color: #8B5A3C;
-    }
-    
-    #save-status {
-      margin-top: 16px;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      text-align: center;
-    }
-    
-    .success {
-      background-color: rgba(244, 228, 188, 0.8);
-      color: #8B5A3C;
-      border: 1px solid #D4A574;
-    }
-    
-    .error {
-      background-color: #fed7d7;
-      color: #c53030;
-      border: 1px solid #feb2b2;
-    }
-    
-    .loading {
-      background-color: rgba(244, 228, 188, 0.6);
-      color: #8B5A3C;
-      border: 1px solid #D4A574;
-    }
-    
-    .disclaimer {
-      background: rgba(212, 165, 116, 0.1);
-      border: 1px solid rgba(212, 165, 116, 0.3);
-      border-radius: 12px;
-      padding: 16px;
-      margin-top: 24px;
-      font-size: 13px;
-      color: #4a5568;
-      line-height: 1.5;
-    }
-    
-    .disclaimer-title {
-      font-weight: 600;
-      color: #2d3748;
-      margin-bottom: 6px;
-    }
-    
-    .error-message {
-      background: #fed7d7;
-      color: #c53030;
-      padding: 16px;
-      border-radius: 12px;
-      margin-top: 16px;
-      font-weight: 500;
-      text-align: center;
-    }
-    
-    /* Mobile responsiveness */
-    @media (max-width: 600px) {
-      body {
-        padding: 12px;
-      }
-      
-      .container {
-        padding: 24px;
-        border-radius: 16px;
-      }
-      
-      h1 {
-        font-size: 1.8em;
-      }
-      
-      input, .calculate-btn {
-        padding: 14px 16px;
-      }
-    }
-    
-    /* Dark mode support */
-    @media (prefers-color-scheme: dark) {
-      .container {
-        background: rgba(26, 32, 44, 0.95);
-        color: #e2e8f0;
-      }
-      
-      h1 {
-        color: #e2e8f0;
-      }
-      
-      .subtitle {
-        color: #a0aec0;
-      }
-      
-      label {
-        color: #cbd5e0;
-      }
-      
-      input {
-        background: #2d3748;
-        border-color: #4a5568;
-        color: #e2e8f0;
-      }
-      
-      input:focus {
-        background: #374151;
-      }
-      
-      .disclaimer {
-        background: rgba(102, 126, 234, 0.1);
-        color: #cbd5e0;
-      }
-      
-      .disclaimer-title {
-        color: #e2e8f0;
-      }
-      
-      .info-section {
-        background: rgba(74, 85, 104, 0.3);
-        border-color: rgba(203, 213, 224, 0.3);
-      }
-      
-      .info-header {
-        color: #D4A574;
-      }
-      
-      .info-content {
-        color: #e2e8f0;
-      }
-      
-      .info-item strong {
-        color: #D4A574;
-      }
-      
-      .info-note {
-        background: rgba(212, 165, 116, 0.2);
-        color: #D4A574;
-      }
-      
-      .info-link {
-        color: #F4E4BC;
-      }
-      
-      .info-link:hover {
-        color: #D4A574;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Work Log</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: white;
+            color: #4a90e2;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab.active:hover {
+            background: white;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(74, 144, 226, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-message, .error-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-weight: 500;
+        }
+
+        .success-message {
+            background: #d1edff;
+            color: #0c5460;
+            border: 1px solid #b8daff;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .entries-list {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .entry-item {
+            background: white;
+            margin: 10px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #4a90e2;
+        }
+
+        .entry-date {
+            font-weight: 600;
+            color: #4a90e2;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .entry-time {
+            font-weight: 500;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+
+        .entry-activity {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .entry-location {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .setup-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .setup-section h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .setup-section p {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .setup-section code {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="logo-container">
-      <img src="https://static.wixstatic.com/media/0dccc6_872c04d23a014ce5b97f7e405a0f7e1c~mv2.png/v1/fill/w_598,h_190,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Resida_Logo%20(2).png" alt="RESIDA Logo" class="logo" onerror="this.style.display='none'">
-    </div>
-    
-    <h1>GFZ-Rechner</h1>
-    <p class="subtitle">Perchtoldsdorf Geschoßflächenzahl</p>
-    
-    <div class="form-group">
-      <label for="adresse">📍 Adresse</label>
-      <input type="text" id="adresse" placeholder="z.B. Marktplatz 1">
-    </div>
-    
-    <div class="form-group">
-      <label for="grundstück">📐 Grundstücksfläche (m²)</label>
-      <input type="number" id="grundstück" placeholder="z.B. 600" step="0.01">
-    </div>
-    
-    <div class="form-group">
-      <label for="verbaute">🏗️ Verbaute Fläche pro Geschoss (m²)</label>
-      <input type="number" id="verbaute" placeholder="z.B. 200" step="0.01">
-    </div>
-    
-    <div class="form-group">
-      <label for="geschosse">🏢 Anzahl oberirdische Geschosse</label>
-      <input type="number" id="geschosse" placeholder="z.B. 2">
-    </div>
-    
-    <button class="calculate-btn" onclick="berechneGFZ()">
-      ✨ GFZ berechnen
-    </button>
-    
-    <div class="result" id="ergebnis"></div>
-    
-    <!-- Information Section -->
-    <div class="info-section">
-      <div class="info-header">📚 So messen Sie richtig</div>
-      <div class="info-content">
-        <div class="info-item">
-          <strong>📍 Adresse:</strong> Einfach die genaue Adresse Ihres Grundstücks eingeben.
+    <div class="container">
+        <div class="header">
+            <h1>Travel Work Log</h1>
+            <p>Track your business travel activities and locations</p>
         </div>
-        <div class="info-item">
-          <strong>📐 Grundstücksfläche:</strong> Die Gesamtfläche Ihres Grundstücks in m². Diese finden Sie im <strong>Grundbuch</strong> oder können sie mit einem Maßband nachmessen.
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('add')">Add Entry</button>
+            <button class="tab" onclick="switchTab('view')">View Entries</button>
+            <button class="tab" onclick="switchTab('setup')">Setup</button>
         </div>
-        <div class="info-item">
-          <strong>🏗️ Verbaute Fläche pro Geschoss:</strong> Die Außenmaße des Gebäudes pro Geschoss (inkl. Außenwände). <strong>Tipp:</strong> Im Grundbuch oft als "verbaute Fläche" eingetragen - diese Angabe kann aber ungenau sein.
+        
+        <div class="content">
+            <!-- Add Entry Tab -->
+            <div id="add-tab" class="tab-content active">
+                <form id="entry-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="date">Date:</label>
+                            <input type="date" id="date" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="time">Time:</label>
+                            <input type="time" id="time" name="time" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="activity">Activity:</label>
+                        <select id="activity" name="activity" required>
+                            <option value="">Select activity type...</option>
+                            <option value="Travel - Departure">Travel - Departure</option>
+                            <option value="Travel - Arrival">Travel - Arrival</option>
+                            <option value="Work - Customer Location">Work - Customer Location</option>
+                            <option value="Work - Office">Work - Office</option>
+                            <option value="Break - Lunch">Break - Lunch</option>
+                            <option value="Break - Other">Break - Other</option>
+                            <option value="Hotel Check-in">Hotel Check-in</option>
+                            <option value="Hotel Check-out">Hotel Check-out</option>
+                            <option value="Flight">Flight</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description:</label>
+                        <textarea id="description" name="description" placeholder="e.g., leaving home driving to work, lunch break, work at customer location..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="location">Location:</label>
+                        <input type="text" id="location" name="location" placeholder="e.g., Home, Customer Office Munich, Hotel Marriott Berlin..." required>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="submit-btn">Add Entry</button>
+                </form>
+                
+                <div id="message-area"></div>
+            </div>
+            
+            <!-- View Entries Tab -->
+            <div id="view-tab" class="tab-content">
+                <div style="margin-bottom: 20px;">
+                    <button class="btn" onclick="loadEntries()">Refresh Entries</button>
+                </div>
+                <div id="entries-container">
+                    <p style="text-align: center; color: #6c757d; padding: 40px;">Click "Refresh Entries" to load your travel log data.</p>
+                </div>
+            </div>
+            
+            <!-- Setup Tab -->
+            <div id="setup-tab" class="tab-content">
+                <div class="setup-section">
+                    <h3>🔧 Initial Setup Required</h3>
+                    <p>To use this app, you need to:</p>
+                    <ol style="margin-left: 20px; color: #856404;">
+                        <li>Create a Google Sheet with these column headers: <code>Date</code>, <code>Time</code>, <code>Activity</code>, <code>Description</code>, <code>Location</code></li>
+                        <li>Share the sheet publicly (anyone with link can edit)</li>
+                        <li>Get the sheet ID from the URL and enter it below</li>
+                        <li>Deploy this HTML file to GitHub Pages</li>
+                    </ol>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sheet-id">Google Sheets ID:</label>
+                    <input type="text" id="sheet-id" placeholder="Enter your Google Sheets ID here..." onchange="saveSheetId()">
+                    <small style="color: #6c757d; display: block; margin-top: 5px;">
+                        Find this in your Google Sheets URL: docs.google.com/spreadsheets/d/<strong>YOUR_SHEET_ID</strong>/edit
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sheet-name">Sheet Name (tab name):</label>
+                    <input type="text" id="sheet-name" value="Sheet1" onchange="saveSheetName()">
+                    <small style="color: #6c757d; display: block; margin-top: 5px;">
+                        The name of the tab in your Google Sheet (usually "Sheet1")
+                    </small>
+                </div>
+                
+                <div style="margin-top: 30px; padding: 20px; background: #e7f3ff; border-radius: 10px;">
+                    <h4 style="color: #0c5460; margin-bottom: 10px;">📝 Instructions:</h4>
+                    <ol style="color: #0c5460; margin-left: 20px;">
+                        <li>Create a new Google Sheet</li>
+                        <li>Add headers: Date, Time, Activity, Description, Location</li>
+                        <li>Share → Anyone with the link → Editor</li>
+                        <li>Copy the sheet ID from URL</li>
+                        <li>Paste it above and save</li>
+                        <li>Upload this HTML file to GitHub Pages</li>
+                    </ol>
+                </div>
+            </div>
         </div>
-        <div class="info-item">
-          <strong>🏢 Anzahl Geschosse:</strong> Nur <strong>Vollgeschosse</strong> zählen (meist Erdgeschoss + Obergeschosse). Keller und nicht ausgebaute Dachböden zählen normalerweise nicht dazu.
-        </div>
-        <div class="info-note">
-          💡 <strong>Hinweis:</strong> Die Angaben im Grundbuch sind ein guter Ausgangspunkt, aber für genaue Berechnungen sollten Sie selbst nachmessen oder einen Fachmann beauftragen.
-          <br><br>
-          📖 <strong>Mehr Details:</strong> <a href="https://www.hausgarten.net/geschossflaechenzahl-berechnen/" target="_blank" rel="noopener noreferrer" class="info-link">Ausführliche Anleitung zur GFZ-Berechnung</a>
-        </div>
-      </div>
     </div>
-    
-    <div class="disclaimer">
-      <div class="disclaimer-title">🔒 Datenschutzhinweis</div>
-      Die eingegebenen Berechnungsdaten werden zur statistischen Auswertung gespeichert. 
-      Es werden keine personenbezogenen Daten erfasst oder gespeichert. Die Nutzung erfolgt anonym.
-    </div>
-  </div>
 
-  <script>
-  function berechneGFZ() {
-    const adresse = document.getElementById("adresse").value;
-    const grundstück = parseFloat(document.getElementById("grundstück").value);
-    const verbaute = parseFloat(document.getElementById("verbaute").value);
-    const geschosse = parseFloat(document.getElementById("geschosse").value);
-    const ergebnisDiv = document.getElementById("ergebnis");
-    
-    // Validation
-    if (!adresse || isNaN(grundstück) || isNaN(verbaute) || isNaN(geschosse) ||
-        grundstück <= 0 || verbaute <= 0 || geschosse <= 0) {
-      ergebnisDiv.innerHTML = '<div class="error-message">❗ Bitte alle Felder korrekt ausfüllen</div>';
-      ergebnisDiv.classList.add('show');
-      return;
-    }
-    
-    // Calculate GFZ
-    const gesamtfläche = verbaute * geschosse;
-    const gfz = (gesamtfläche / grundstück).toFixed(2);
-    
-    // Show result
-    ergebnisDiv.innerHTML = `
-      <div class="result-item">
-        <span class="highlight">📍 Adresse:</span> ${adresse}
-      </div>
-      <div class="result-item">
-        <span class="highlight">📊 Berechnete GFZ:</span> <span class="gfz-value">${gfz}</span>
-      </div>
-      <div class="result-item">
-        <span class="highlight">🏘️ Gesamtfläche:</span> ${gesamtfläche.toLocaleString()} m²
-      </div>
-      <div class="result-item">
-        <small>💡 Zulässig in Perchtoldsdorf: max. 1,0 im Ortszentrum</small>
-      </div>
-      <div id="save-status" class="loading">💾 Speichere Daten...</div>
-    `;
-    
-    ergebnisDiv.classList.add('show');
-    
-    // Send data using form submission (bypasses CORS)
-    sendDataToSheet(adresse, grundstück, verbaute, geschosse, gfz);
-  }
-  
-  function sendDataToSheet(adresse, grundstück, verbaute, geschosse, gfz) {
-    // Create form
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'https://script.google.com/macros/s/AKfycbx1ZQhReFYfZ06qPgKea-cMxeDcCZSle8YIOXfVtabVEXYQg7EfIHuBPjOEA3pyVyBa/exec';
-    form.target = 'hidden_iframe';
-    
-    // Create form fields
-    const fields = {
-      adresse: adresse,
-      grundstück: grundstück,
-      verbaute: verbaute,
-      geschosse: geschosse,
-      gfz: parseFloat(gfz)
-    };
-    
-    Object.keys(fields).forEach(key => {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = key;
-      input.value = fields[key];
-      form.appendChild(input);
-    });
-    
-    // Create or get hidden iframe
-    let iframe = document.getElementById('hidden_iframe');
-    if (!iframe) {
-      iframe = document.createElement('iframe');
-      iframe.id = 'hidden_iframe';
-      iframe.name = 'hidden_iframe';
-      iframe.style.display = 'none';
-      document.body.appendChild(iframe);
-    }
-    
-    // Handle iframe load (indicates form submission completed)
-    iframe.onload = function() {
-      const saveStatusDiv = document.getElementById("save-status");
-      if (saveStatusDiv) {
-        saveStatusDiv.innerHTML = "✅ Daten erfolgreich gespeichert!";
-        saveStatusDiv.className = "success";
-      }
-      
-      // Clean up form
-      if (form.parentNode) {
-        form.parentNode.removeChild(form);
-      }
-    };
-    
-    // Handle iframe error
-    iframe.onerror = function() {
-      const saveStatusDiv = document.getElementById("save-status");
-      if (saveStatusDiv) {
-        saveStatusDiv.innerHTML = "❌ Fehler beim Speichern";
-        saveStatusDiv.className = "error";
-      }
-    };
-    
-    // Submit form
-    document.body.appendChild(form);
-    
-    // Add timeout fallback
-    setTimeout(function() {
-      const saveStatusDiv = document.getElementById("save-status");
-      if (saveStatusDiv && saveStatusDiv.innerHTML.includes("Speichere")) {
-        saveStatusDiv.innerHTML = "✅ Daten gesendet";
-        saveStatusDiv.className = "success";
-      }
-      
-      // Clean up form
-      if (form.parentNode) {
-        form.parentNode.removeChild(form);
-      }
-    }, 3000);
-    
-    form.submit();
-  }
-  
-  // Add enter key support
-  document.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-      berechneGFZ();
-    }
-  });
-  </script>
+    <script>
+        // Configuration
+        let SHEET_ID = localStorage.getItem('sheetId') || '';
+        let SHEET_NAME = localStorage.getItem('sheetName') || 'Sheet1';
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current date and time as defaults
+            const now = new Date();
+            document.getElementById('date').value = now.toISOString().split('T')[0];
+            document.getElementById('time').value = now.toTimeString().split(' ')[0].substring(0, 5);
+            
+            // Load saved configuration
+            document.getElementById('sheet-id').value = SHEET_ID;
+            document.getElementById('sheet-name').value = SHEET_NAME;
+        });
+        
+        // Tab switching
+        function switchTab(tabName) {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+        
+        // Save configuration
+        function saveSheetId() {
+            SHEET_ID = document.getElementById('sheet-id').value;
+            localStorage.setItem('sheetId', SHEET_ID);
+        }
+        
+        function saveSheetName() {
+            SHEET_NAME = document.getElementById('sheet-name').value;
+            localStorage.setItem('sheetName', SHEET_NAME);
+        }
+        
+        // Form submission
+        document.getElementById('entry-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!SHEET_ID) {
+                showMessage('Please configure your Google Sheets ID in the Setup tab first.', 'error');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submit-btn');
+            const originalText = submitBtn.textContent;
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Adding Entry...';
+            
+            try {
+                const formData = new FormData(e.target);
+                const data = {
+                    date: formData.get('date'),
+                    time: formData.get('time'),
+                    activity: formData.get('activity'),
+                    description: formData.get('description'),
+                    location: formData.get('location')
+                };
+                
+                await addToGoogleSheets(data);
+                showMessage('Entry added successfully!', 'success');
+                e.target.reset();
+                
+                // Reset to current date/time
+                const now = new Date();
+                document.getElementById('date').value = now.toISOString().split('T')[0];
+                document.getElementById('time').value = now.toTimeString().split(' ')[0].substring(0, 5);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Failed to add entry. Please check your internet connection and Sheet configuration.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+        
+        // Add data to Google Sheets
+        async function addToGoogleSheets(data) {
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit#gid=0`;
+            
+            // For GitHub Pages deployment, you'll need to use Google Apps Script
+            // This is a placeholder - see instructions below for actual implementation
+            const response = await fetch(`https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec`, {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: 'addEntry',
+                    sheetId: SHEET_ID,
+                    sheetName: SHEET_NAME,
+                    data: data
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to add entry');
+            }
+        }
+        
+        // Load entries from Google Sheets
+        async function loadEntries() {
+            if (!SHEET_ID) {
+                showMessage('Please configure your Google Sheets ID in the Setup tab first.', 'error');
+                return;
+            }
+            
+            const container = document.getElementById('entries-container');
+            container.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px;">Loading entries...</p>';
+            
+            try {
+                // This would fetch from your Google Apps Script
+                const response = await fetch(`https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?action=getEntries&sheetId=${SHEET_ID}&sheetName=${SHEET_NAME}`);
+                const entries = await response.json();
+                
+                displayEntries(entries);
+            } catch (error) {
+                console.error('Error loading entries:', error);
+                container.innerHTML = '<p style="text-align: center; color: #dc3545; padding: 40px;">Failed to load entries. Please check your configuration.</p>';
+            }
+        }
+        
+        // Display entries
+        function displayEntries(entries) {
+            const container = document.getElementById('entries-container');
+            
+            if (!entries || entries.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px;">No entries found.</p>';
+                return;
+            }
+            
+            const entriesHtml = entries.map(entry => `
+                <div class="entry-item">
+                    <div class="entry-date">${entry.date}</div>
+                    <div class="entry-time">${entry.time}</div>
+                    <div class="entry-activity"><strong>${entry.activity}</strong></div>
+                    <div class="entry-description">${entry.description}</div>
+                    <div class="entry-location">📍 ${entry.location}</div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = `<div class="entries-list">${entriesHtml}</div>`;
+        }
+        
+        // Show message
+        function showMessage(message, type) {
+            const messageArea = document.getElementById('message-area');
+            messageArea.innerHTML = `<div class="${type}-message">${message}</div>`;
+            
+            setTimeout(() => {
+                messageArea.innerHTML = '';
+            }, 5000);
+        }
+    </script>
 </body>
 </html>
