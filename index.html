@@ -350,6 +350,14 @@
                 </div>
                 
                 <div class="form-group">
+                    <label for="script-url">Google Apps Script URL:</label>
+                    <input type="url" id="script-url" placeholder="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec" onchange="saveScriptUrl()">
+                    <small style="color: #6c757d; display: block; margin-top: 5px;">
+                        The Web app URL from your deployed Google Apps Script
+                    </small>
+                </div>
+                
+                <div class="form-group">
                     <label for="sheet-id">Google Sheets ID:</label>
                     <input type="text" id="sheet-id" placeholder="Enter your Google Sheets ID here..." onchange="saveSheetId()">
                     <small style="color: #6c757d; display: block; margin-top: 5px;">
@@ -366,14 +374,15 @@
                 </div>
                 
                 <div style="margin-top: 30px; padding: 20px; background: #e7f3ff; border-radius: 10px;">
-                    <h4 style="color: #0c5460; margin-bottom: 10px;">📝 Instructions:</h4>
+                    <h4 style="color: #0c5460; margin-bottom: 10px;">📝 Complete Setup Instructions:</h4>
                     <ol style="color: #0c5460; margin-left: 20px;">
-                        <li>Create a new Google Sheet</li>
-                        <li>Add headers: Date, Time, Activity, Description, Location</li>
-                        <li>Share → Anyone with the link → Editor</li>
-                        <li>Copy the sheet ID from URL</li>
-                        <li>Paste it above and save</li>
-                        <li>Upload this HTML file to GitHub Pages</li>
+                        <li><strong>Create Google Sheet:</strong> New sheet with headers: Date, Time, Activity, Description, Location</li>
+                        <li><strong>Share Sheet:</strong> Share → Anyone with the link → Editor</li>
+                        <li><strong>Create Apps Script:</strong> Go to script.google.com → New Project → Paste the provided code</li>
+                        <li><strong>Deploy Script:</strong> Deploy → New deployment → Web app → Execute as "Me" → Access "Anyone" → Deploy</li>
+                        <li><strong>Copy URLs:</strong> Copy both the Sheet ID and the Apps Script web app URL</li>
+                        <li><strong>Configure App:</strong> Paste both URLs above and save</li>
+                        <li><strong>Test:</strong> Try adding an entry to verify everything works!</li>
                     </ol>
                 </div>
             </div>
@@ -384,6 +393,7 @@
         // Configuration
         let SHEET_ID = localStorage.getItem('sheetId') || '';
         let SHEET_NAME = localStorage.getItem('sheetName') || 'Sheet1';
+        let SCRIPT_URL = localStorage.getItem('scriptUrl') || '';
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -395,6 +405,7 @@
             // Load saved configuration
             document.getElementById('sheet-id').value = SHEET_ID;
             document.getElementById('sheet-name').value = SHEET_NAME;
+            document.getElementById('script-url').value = SCRIPT_URL;
         });
         
         // Tab switching
@@ -417,6 +428,11 @@
         function saveSheetName() {
             SHEET_NAME = document.getElementById('sheet-name').value;
             localStorage.setItem('sheetName', SHEET_NAME);
+        }
+        
+        function saveScriptUrl() {
+            SCRIPT_URL = document.getElementById('script-url').value;
+            localStorage.setItem('scriptUrl', SCRIPT_URL);
         }
         
         // Form submission
@@ -464,13 +480,15 @@
         
         // Add data to Google Sheets
         async function addToGoogleSheets(data) {
-            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit#gid=0`;
+            const SCRIPT_URL = localStorage.getItem('scriptUrl') || '';
             
-            // For GitHub Pages deployment, you'll need to use Google Apps Script
-            // This is a placeholder - see instructions below for actual implementation
-            const response = await fetch(`https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec`, {
+            if (!SCRIPT_URL) {
+                throw new Error('Please configure your Google Apps Script URL in the Setup tab first.');
+            }
+            
+            const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
-                mode: 'cors',
+                mode: 'no-cors', // Important for Google Apps Script
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -482,9 +500,8 @@
                 })
             });
             
-            if (!response.ok) {
-                throw new Error('Failed to add entry');
-            }
+            // Note: With no-cors mode, we can't check response status
+            // The script will assume success if no error is thrown
         }
         
         // Load entries from Google Sheets
@@ -494,18 +511,30 @@
                 return;
             }
             
+            const SCRIPT_URL = localStorage.getItem('scriptUrl') || '';
+            
+            if (!SCRIPT_URL) {
+                showMessage('Please configure your Google Apps Script URL in the Setup tab first.', 'error');
+                return;
+            }
+            
             const container = document.getElementById('entries-container');
             container.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px;">Loading entries...</p>';
             
             try {
-                // This would fetch from your Google Apps Script
-                const response = await fetch(`https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?action=getEntries&sheetId=${SHEET_ID}&sheetName=${SHEET_NAME}`);
+                const response = await fetch(`${SCRIPT_URL}?action=getEntries&sheetId=${SHEET_ID}&sheetName=${SHEET_NAME}`);
                 const entries = await response.json();
                 
-                displayEntries(entries);
+                if (Array.isArray(entries)) {
+                    displayEntries(entries);
+                } else if (entries.error) {
+                    throw new Error(entries.error);
+                } else {
+                    displayEntries([]);
+                }
             } catch (error) {
                 console.error('Error loading entries:', error);
-                container.innerHTML = '<p style="text-align: center; color: #dc3545; padding: 40px;">Failed to load entries. Please check your configuration.</p>';
+                container.innerHTML = '<p style="text-align: center; color: #dc3545; padding: 40px;">Failed to load entries. Please check your configuration and try again.</p>';
             }
         }
         
