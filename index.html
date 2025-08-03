@@ -530,6 +530,11 @@
                     </div>
                     
                     <div class="form-group">
+                        <label for="customer">Customer/Project:</label>
+                        <input type="text" id="customer" name="customer" placeholder="e.g., Gebrüder Weiss, BMW Group, Siemens..." required>
+                    </div>
+                    
+                    <div class="form-group">
                         <label for="activity">Activity:</label>
                         <select id="activity" name="activity" required>
                             <option value="">Select activity type...</option>
@@ -653,10 +658,10 @@
                     </small>
                 </div>
                 
-                <div style="margin-top: 30px; padding: 20px; background: #e7f3ff; border-radius: 10px;">
-                    <h4 style="color: #0c5460; margin-bottom: 10px;">📝 Complete Setup Instructions:</h4>
-                    <ol style="color: #0c5460; margin-left: 20px;">
-                        <li><strong>Create Google Sheet:</strong> New sheet with headers: Date, Time, Activity, Description, Location</li>
+                <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 4px;">
+                    <h4 style="color: #6c757d; margin-bottom: 10px;">📝 Complete Setup Instructions:</h4>
+                    <ol style="color: #6c757d; margin-left: 20px;">
+                        <li><strong>Create Google Sheet:</strong> New sheet with headers: Date, Time, Customer, Activity, Description, Location</li>
                         <li><strong>Share Sheet:</strong> Share → Anyone with the link → Editor</li>
                         <li><strong>Create Apps Script:</strong> Go to script.google.com → New Project → Paste the provided code</li>
                         <li><strong>Deploy Script:</strong> Deploy → New deployment → Web app → Execute as "Me" → Access "Anyone" → Deploy</li>
@@ -664,6 +669,10 @@
                         <li><strong>Configure App:</strong> Paste both URLs above and save</li>
                         <li><strong>Test:</strong> Try adding an entry to verify everything works!</li>
                     </ol>
+                    <div style="margin-top: 15px; padding: 10px; background: #e3f2fd; border-radius: 4px;">
+                        <strong>Important:</strong> Your Google Sheet must have these exact headers in row 1:<br>
+                        <code>Date | Time | Customer | Activity | Description | Location</code>
+                    </div>
                 </div>
             </div>
         </div>
@@ -923,6 +932,7 @@
                 const data = {
                     date: formData.get('date'), // Already in Austrian format DD.MM.YYYY
                     time: formData.get('time'),
+                    customer: formData.get('customer'),
                     activity: formData.get('activity'),
                     description: formData.get('description'),
                     location: formData.get('location')
@@ -1020,15 +1030,41 @@
             // Store entries for reporting
             allEntries = entries;
             
-            const entriesHtml = entries.map(entry => `
-                <div class="entry-item">
-                    <div class="entry-date">${entry.date}</div>
-                    <div class="entry-time">${entry.time}</div>
-                    <div class="entry-activity"><strong>${entry.activity}</strong></div>
-                    <div class="entry-description">${entry.description}</div>
-                    <div class="entry-location">📍 ${entry.location}</div>
-                </div>
-            `).join('');
+            // Sort entries by date and time (newest first)
+            const sortedEntries = entries.sort((a, b) => {
+                const dateA = parseAustrianDate(a.date);
+                const dateB = parseAustrianDate(b.date);
+                
+                if (!dateA || !dateB) return 0;
+                
+                if (dateA.getTime() !== dateB.getTime()) {
+                    return dateB.getTime() - dateA.getTime(); // Newest first
+                }
+                
+                // If same date, sort by time
+                return (b.time || '').localeCompare(a.time || '');
+            });
+            
+            const entriesHtml = sortedEntries.map(entry => {
+                // Clean up the data - sometimes there are extra fields
+                const cleanDate = entry.date || '';
+                const cleanTime = entry.time || '';
+                const cleanCustomer = entry.customer || '';
+                const cleanActivity = entry.activity || '';
+                const cleanDescription = entry.description || '';
+                const cleanLocation = entry.location || '';
+                
+                return `
+                    <div class="entry-item">
+                        <div class="entry-date">${cleanDate}</div>
+                        <div class="entry-time">${cleanTime}</div>
+                        ${cleanCustomer ? `<div class="entry-customer"><strong>👤 ${cleanCustomer}</strong></div>` : ''}
+                        <div class="entry-activity"><strong>${cleanActivity}</strong></div>
+                        <div class="entry-description">${cleanDescription}</div>
+                        <div class="entry-location">📍 ${cleanLocation}</div>
+                    </div>
+                `;
+            }).join('');
             
             container.innerHTML = `<div class="entries-list">${entriesHtml}</div>`;
         }
@@ -1224,7 +1260,16 @@
         
         // Extract project information from entries
         function extractProjectInfo(entries) {
-            // Look for customer or project names in descriptions and locations
+            // First try to get customer info from the customer field
+            const customers = entries
+                .map(e => e.customer)
+                .filter(c => c && c.trim() !== '');
+            
+            if (customers.length > 0) {
+                return customers[0]; // Use first customer found
+            }
+            
+            // Fallback: Look for customer or project names in descriptions and locations
             const locations = entries.map(e => e.location).filter(l => l);
             const descriptions = entries.map(e => e.description).filter(d => d);
             
