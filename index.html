@@ -954,6 +954,9 @@
                     location: formData.get('location')
                 };
 
+                console.log('Form data being sent:', data);
+                console.log('Customer field value:', data.customer);
+
                 await addToGoogleSheets(data);
                 showMessage('Entry added successfully!', 'success');
                 e.target.reset();
