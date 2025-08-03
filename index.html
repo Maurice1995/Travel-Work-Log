@@ -1247,8 +1247,8 @@
             console.log('Matching entries:', monthEntries);
 
             if (monthEntries.length === 0) {
-                // Verbesserte Debug-Informationen
-                const debugInfo = entries.map(e => {
+                // Verbesserte Debug-Informationen - NUR wenn wirklich keine Einträge da sind
+                const debugInfo = entries.slice(0, 5).map(e => { // Nur ersten 5 für Übersichtlichkeit
                     if (!e.date) return 'No date';
 
                     let entryDate = e.date;
@@ -1260,7 +1260,6 @@
                     if (entryDate.includes('T') || entryDate.includes('Z')) {
                         try {
                             const isoDate = new Date(entryDate);
-                            // Verwende lokale Zeit für Debug-Ausgabe
                             const month = String(isoDate.getMonth() + 1).padStart(2, '0');
                             const year = String(isoDate.getFullYear());
                             const localDateStr = isoDate.toLocaleDateString('de-AT');
@@ -1278,13 +1277,14 @@
                     return entryDate + parsedInfo;
                 }).filter(d => d);
 
-                return `Keine Reiseaktivitäten für ${monthName} ${year} gefunden.\n\nDebug - Verfügbare Daten (lokale Zeit):\n${debugInfo.join('\n')}\n\nSuchkriterium: Monat=${String(month).padStart(2, '0')}, Jahr=${String(year)}`;
+                return `Keine Reiseaktivitäten für ${monthName} ${year} gefunden.\n\nDebug - Verfügbare Daten (erste 5 Einträge):\n${debugInfo.join('\n')}\n\nSuchkriterium: Monat=${String(month).padStart(2, '0')}, Jahr=${String(year)}`;
             }
 
-            // Rest der Funktion
+            // Group entries into travel periods
             const travelPeriods = groupIntoTravelPeriods(monthEntries);
             console.log('Travel periods:', travelPeriods);
 
+            // Erstelle den Report im gewünschten Format
             let report = `Reisekostenabrechnung ${monthName} ${year} für ${employeeName}\n\n`;
 
             travelPeriods.forEach((period, index) => {
@@ -1302,18 +1302,19 @@
                 const startFormatted = formatDateWithWeekday(startDate);
                 const endFormatted = formatDateWithWeekday(endDate);
 
+                // Reisezeitraum
                 if (period.startDate === period.endDate) {
-                    report += `**Reisezeitraum: ${startFormatted}**\n`;
+                    report += `**Reisezeitraum: ${startFormatted.toUpperCase()}**\n\n`;
                 } else {
-                    report += `**Reisezeitraum: ${startFormatted} – ${endFormatted}**\n`;
+                    report += `**Reisezeitraum: ${startFormatted.toUpperCase()} – ${endFormatted.toUpperCase()}**\n\n`;
                 }
 
-                // Try to determine project and location from entries
+                // Projekt, Ort und Reisezweck in einer Zeile
                 const project = extractProjectInfo(period.entries);
                 const location = extractLocationInfo(period.entries);
                 const purpose = extractPurposeInfo(period.entries);
 
-                report += `**Projekt:** ${project} **Ort / Staat:** ${location} **Reisezweck:** ${purpose}\n`;
+                report += `**Projekt:** ${project} **Ort / Staat:** ${location} **Reisezweck:** ${purpose}\n\n`;
 
                 // Find travel start and end times
                 const travelStart = findTravelStart(period.entries);
@@ -1323,7 +1324,7 @@
                     const startDate = parseAustrianDate(travelStart.date);
                     if (startDate) {
                         let cleanTime = cleanTimeValue(travelStart.time);
-                        report += `* **Reisebeginn:** ${formatDateWithWeekday(startDate)}, ${cleanTime} Uhr\n`;
+                        report += `• **Reisebeginn:** ${formatDateWithWeekday(startDate)}, ${cleanTime} Uhr\n`;
                     }
                 }
 
@@ -1333,7 +1334,7 @@
                     const crossingDate = parseAustrianDate(crossing.date);
                     if (crossingDate) {
                         let cleanTime = cleanTimeValue(crossing.time);
-                        report += `* **${crossing.type}:** ${formatDateWithWeekday(crossingDate)}, ${cleanTime} Uhr\n`;
+                        report += `• **${crossing.type}:** ${formatDateWithWeekday(crossingDate)}, ${cleanTime} Uhr\n`;
                     }
                 });
 
@@ -1341,11 +1342,11 @@
                     const endDate = parseAustrianDate(travelEnd.date);
                     if (endDate) {
                         let cleanTime = cleanTimeValue(travelEnd.time);
-                        report += `* **Reiseende:** ${formatDateWithWeekday(endDate)}, ${cleanTime} Uhr\n`;
+                        report += `• **Reiseende:** ${formatDateWithWeekday(endDate)}, ${cleanTime} Uhr\n`;
                     }
                 }
 
-                report += '\n';
+                report += '\n'; // Extra Leerzeile zwischen Perioden
             });
 
             console.log('=== GENERATED REPORT ===');
@@ -1431,9 +1432,9 @@
             return periods;
         }
 
-        // Format date with German weekday
         function formatDateWithWeekday(date) {
-            const weekdays = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+            // Deutsche Wochentage in der gewünschten Abkürzung
+            const weekdays = ['SO', 'MO', 'DI', 'MI', 'DO', 'FR', 'SA'];
             const weekday = weekdays[date.getDay()];
             return `${weekday}, ${formatDateAustrian(date)}`;
         }
@@ -1451,15 +1452,14 @@
 
             // Fallback: Look for customer or project names in descriptions and locations
             const locations = entries.map(e => e.location).filter(l => l);
-            const descriptions = entries.map(e => e.description).filter(d => d);
 
             // Try to find a company or project name
             for (const location of locations) {
                 if (location.toLowerCase().includes('customer') ||
                     location.toLowerCase().includes('kunde') ||
-                    !location.toLowerCase().includes('hotel') &&
-                    !location.toLowerCase().includes('home') &&
-                    !location.toLowerCase().includes('office')) {
+                    (!location.toLowerCase().includes('hotel') &&
+                        !location.toLowerCase().includes('home') &&
+                        !location.toLowerCase().includes('office'))) {
                     return location;
                 }
             }
@@ -1470,12 +1470,22 @@
         // Extract location information
         function extractLocationInfo(entries) {
             const workLocations = entries
-                .filter(e => e.activity && e.activity.includes('Work'))
+                .filter(e => e.activity && (e.activity.includes('Work') || e.activity.includes('Customer')))
                 .map(e => e.location)
                 .filter(l => l && !l.toLowerCase().includes('hotel') && !l.toLowerCase().includes('home'));
 
             if (workLocations.length > 0) {
                 return workLocations[0];
+            }
+
+            // Fallback: Schaue nach Städten/Orten in allen Locations
+            const allLocations = entries.map(e => e.location).filter(l => l);
+            for (const location of allLocations) {
+                if (!location.toLowerCase().includes('hotel') &&
+                    !location.toLowerCase().includes('home') &&
+                    !location.toLowerCase().includes('office')) {
+                    return location;
+                }
             }
 
             return 'Ort angeben';
@@ -1587,76 +1597,44 @@
         }
 
         // Create proper ODT content with real formatting
+        // Verbesserte ODT-Erstellung
         function createODTContent(reportText) {
-            // Create a proper ODT file structure
-            const manifestContent = `<?xml version="1.0" encoding="UTF-8"?>
-<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2">
-  <manifest:file-entry manifest:full-path="/" manifest:version="1.2" manifest:media-type="application/vnd.oasis.opendocument.text"/>
-  <manifest:file-entry manifest:full-path="meta.xml" manifest:media-type="text/xml"/>
-  <manifest:file-entry manifest:full-path="settings.xml" manifest:media-type="text/xml"/>
-  <manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/>
-  <manifest:file-entry manifest:full-path="styles.xml" manifest:media-type="text/xml"/>
-</manifest:manifest>`;
+            // Konvertiere das Format für bessere ODT-Darstellung
+            let odtText = reportText;
 
-            const metaContent = `<?xml version="1.0" encoding="UTF-8"?>
-<office:document-meta xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:dc="http://purl.org/dc/elements/1.1/" office:version="1.2">
-  <office:meta>
-    <meta:generator>Travel Log System</meta:generator>
-    <dc:title>Reisekostenabrechnung</dc:title>
-    <dc:creator>Cargometer Travel Log</dc:creator>
-    <meta:creation-date>${new Date().toISOString()}</meta:creation-date>
-  </office:meta>
-</office:document-meta>`;
-
-            const stylesContent = `<?xml version="1.0" encoding="UTF-8"?>
-<office:document-styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" office:version="1.2">
-  <office:styles>
-    <style:default-style style:family="paragraph">
-      <style:paragraph-properties fo:hyphenation-ladder-count="no-limit" style:text-autospace="ideograph-alpha" style:punctuation-wrap="hanging" style:line-break="strict" style:tab-stop-distance="1.251cm" style:writing-mode="page"/>
-      <style:text-properties style:use-window-font-color="true" style:font-name="Times New Roman" fo:font-size="12pt" fo:language="de" fo:country="AT" style:font-name-asian="SimSun" style:font-size-asian="12pt" style:language-asian="zh" style:country-asian="CN" style:font-name-complex="Lucida Sans Unicode" style:font-size-complex="12pt" style:language-complex="hi" style:country-complex="IN"/>
-    </style:default-style>
-    <style:style style:name="Standard" style:family="paragraph" style:class="text"/>
-    <style:style style:name="Heading_20_1" style:display-name="Heading 1" style:family="paragraph" style:parent-style-name="Heading" style:next-style-name="Text_20_body" style:class="text">
-      <style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.212cm" style:contextual-spacing="false" fo:keep-with-next="always"/>
-      <style:text-properties fo:font-size="18pt" fo:font-weight="bold" style:font-size-asian="18pt" style:font-weight-asian="bold" style:font-size-complex="18pt" style:font-weight-complex="bold"/>
-    </style:style>
-    <style:style style:name="Bold" style:family="text">
-      <style:text-properties fo:font-weight="bold" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
-    </style:style>
-  </office:styles>
-</office:document-styles>`;
-
-            // Convert markdown-style formatting to ODT
-            const formattedText = reportText
+            // Ersetze Markdown-Formatting mit ODT-Tags
+            odtText = odtText
                 .replace(/\*\*(.*?)\*\*/g, '<text:span text:style-name="Bold">$1</text:span>')
-                .replace(/\n/g, '</text:p>\n<text:p text:style-name="Standard">');
+                .replace(/• /g, '• ') // Bullet points beibehalten
+                .replace(/\n\n/g, '</text:p><text:p text:style-name="Standard">') // Doppelte Zeilenumbrüche
+                .replace(/\n/g, '<text:line-break/>'); // Einfache Zeilenumbrüche
 
             const contentContent = `<?xml version="1.0" encoding="UTF-8"?>
-<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" office:version="1.2">
+<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" 
+    xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" 
+    xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" 
+    xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" 
+    office:version="1.2">
   <office:automatic-styles>
     <style:style style:name="Bold" style:family="text">
-      <style:text-properties fo:font-weight="bold" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
+      <style:text-properties fo:font-weight="bold"/>
+    </style:style>
+    <style:style style:name="Standard" style:family="paragraph">
+      <style:paragraph-properties fo:margin-bottom="0.212cm"/>
+      <style:text-properties fo:font-name="Times New Roman" fo:font-size="12pt"/>
+    </style:style>
+    <style:style style:name="Title" style:family="paragraph">
+      <style:paragraph-properties fo:margin-bottom="0.423cm" fo:text-align="left"/>
+      <style:text-properties fo:font-name="Times New Roman" fo:font-size="16pt" fo:font-weight="bold"/>
     </style:style>
   </office:automatic-styles>
   <office:body>
     <office:text>
-      <text:p text:style-name="Standard">${formattedText}</text:p>
+      <text:p text:style-name="Standard">${odtText}</text:p>
     </office:text>
   </office:body>
 </office:document-content>`;
 
-            const settingsContent = `<?xml version="1.0" encoding="UTF-8"?>
-<office:document-settings xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" office:version="1.2">
-  <office:settings>
-    <config:config-item-set config:name="ooo:view-settings">
-      <config:config-item config:name="ViewAreaTop" config:type="long">0</config:config-item>
-      <config:config-item config:name="ViewAreaLeft" config:type="long">0</config:config-item>
-    </config:config-item-set>
-  </office:settings>
-</office:document-settings>`;
-
-            // For a simple version, return just the content
-            // In a real implementation, you'd create a proper ZIP file with all components
             return contentContent;
         }
 
