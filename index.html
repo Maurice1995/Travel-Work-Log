@@ -984,6 +984,22 @@
             }
 
             console.log('Sending data to Google Sheets:', data);
+            console.log('Individual fields:');
+            console.log('  Date:', data.date);
+            console.log('  Time:', data.time);
+            console.log('  Customer:', data.customer);
+            console.log('  Activity:', data.activity);
+            console.log('  Description:', data.description);
+            console.log('  Location:', data.location);
+
+            const payload = {
+                action: 'addEntry',
+                sheetId: SHEET_ID,
+                sheetName: SHEET_NAME,
+                data: data
+            };
+
+            console.log('Full payload:', JSON.stringify(payload, null, 2));
 
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
@@ -991,12 +1007,7 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    action: 'addEntry',
-                    sheetId: SHEET_ID,
-                    sheetName: SHEET_NAME,
-                    data: data
-                })
+                body: JSON.stringify(payload)
             });
 
             // Note: With no-cors mode, we can't check response status
