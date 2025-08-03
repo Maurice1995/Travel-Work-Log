@@ -733,7 +733,7 @@
             return `${day}.${month}.${year}`;
         }
 
-        // Parse Austrian date format to Date object
+        // Parse Austrian date format to Date object - handles multiple formats
         function parseAustrianDate(dateStr) {
             if (!dateStr) return null;
             
@@ -756,12 +756,16 @@
             } else if (cleanDate.includes('T') || cleanDate.includes('Z') || cleanDate.includes('-')) {
                 // ISO format or timestamp
                 try {
-                    return new Date(cleanDate);
+                    const isoDate = new Date(cleanDate);
+                    if (!isNaN(isoDate.getTime())) {
+                        return isoDate;
+                    }
                 } catch (e) {
                     console.log('Could not parse ISO date:', cleanDate);
                 }
             }
             
+            console.log('Could not parse date:', dateStr);
             return null;
         }
 
@@ -1187,70 +1191,82 @@
         
         // Generate report content
         function generateReportContent(entries, month, year, employeeName, monthName) {
+            console.log('Generating report for:', month, year);
+            console.log('All entries:', entries);
+            
             // Filter entries for the selected month/year
             const monthEntries = entries.filter(entry => {
                 if (!entry.date) return false;
                 
                 let entryDate = entry.date;
+                console.log('Processing entry date:', entryDate);
                 
                 // Clean up the date if it has extra characters or formatting
                 if (entryDate.startsWith("'")) {
                     entryDate = entryDate.substring(1);
                 }
                 
-                // Handle different date formats
-                let dateParts;
+                // Parse the date to extract month and year
+                let entryMonth, entryYear;
                 
                 if (entryDate.includes('.')) {
                     // Austrian format DD.MM.YYYY
-                    dateParts = entryDate.split('.');
-                } else if (entryDate.includes('-')) {
-                    // ISO format YYYY-MM-DD
-                    const isoDate = new Date(entryDate);
-                    if (!isNaN(isoDate.getTime())) {
-                        dateParts = [
-                            String(isoDate.getDate()).padStart(2, '0'),
-                            String(isoDate.getMonth() + 1).padStart(2, '0'),
-                            String(isoDate.getFullYear())
-                        ];
+                    const dateParts = entryDate.split('.');
+                    if (dateParts.length === 3) {
+                        entryMonth = dateParts[1].padStart(2, '0');
+                        entryYear = dateParts[2];
                     }
-                } else if (entryDate.includes('T') || entryDate.includes('Z')) {
-                    // Full ISO timestamp
+                } else if (entryDate.includes('T') || entryDate.includes('Z') || entryDate.includes('-')) {
+                    // ISO format or timestamp
                     try {
                         const isoDate = new Date(entryDate);
                         if (!isNaN(isoDate.getTime())) {
-                            dateParts = [
-                                String(isoDate.getDate()).padStart(2, '0'),
-                                String(isoDate.getMonth() + 1).padStart(2, '0'),
-                                String(isoDate.getFullYear())
-                            ];
+                            entryMonth = String(isoDate.getMonth() + 1).padStart(2, '0');
+                            entryYear = String(isoDate.getFullYear());
                         }
                     } catch (e) {
-                        console.log('Could not parse date:', entryDate);
+                        console.log('Could not parse ISO date:', entryDate);
                         return false;
                     }
-                }
-                
-                if (!dateParts || dateParts.length !== 3) {
-                    console.log('Invalid date format:', entryDate);
+                } else {
+                    console.log('Unknown date format:', entryDate);
                     return false;
                 }
                 
-                const entryMonth = dateParts[1];
-                const entryYear = dateParts[2];
+                const matches = entryMonth === month && entryYear === year;
+                console.log(`Entry: ${entryDate} -> Month: ${entryMonth}, Year: ${entryYear} | Filter: ${month}/${year} | Matches: ${matches}`);
                 
-                console.log(`Comparing entry date: ${entryDate} -> Month: ${entryMonth}, Year: ${entryYear} with filter Month: ${month}, Year: ${year}`);
-                
-                return entryMonth === month && entryYear === year;
+                return matches;
             });
             
-            console.log(`Found ${monthEntries.length} entries for ${monthName} ${year}`);
+            console.log(`Found ${monthEntries.length} matching entries for ${monthName} ${year}`);
             
             if (monthEntries.length === 0) {
-                // Debug: Show what dates we found
-                const allDates = entries.map(e => e.date).filter(d => d);
-                console.log('All available dates:', allDates);
-                return `Keine Reiseaktivitäten für ${monthName} ${year} gefunden.\n\nVerfügbare Daten: ${allDates.join(', ')}`;
+                // Debug: Show what dates we found and how they were parsed
+                const debugInfo = entries.map(e => {
+                    if (!e.date) return 'No date';
+                    
+                    let parsedInfo = '';
+                    if (e.date.includes('T') || e.date.includes('Z')) {
+                        try {
+                            const isoDate = new Date(e.date);
+                            const month = String(isoDate.getMonth() + 1).padStart(2, '0');
+                            const year = String(isoDate.getFullYear());
+                            parsedInfo = ` (${month}/${year})`;
+                        } catch (err) {
+                            parsedInfo = ' (parse error)';
+                        }
+                    } else if (e.date.includes('.')) {
+                        const parts = e.date.split('.');
+                        if (parts.length === 3) {
+                            parsedInfo = ` (${parts[1]}/${parts[2]})`;
+                        }
+                    }
+                    
+                    return e.date + parsedInfo;
+                }).filter(d => d);
+                
+                return `Keine Reiseaktivitäten für ${monthName} ${year} gefunden.\n\nDebug - Verfügbare Daten:\n${debugInfo.join('\n')}\n\nSuchkriterium: Monat=${month}, Jahr=${year}`;
             }
             
             // Group entries by travel periods (consecutive dates or same project)
@@ -1261,6 +1277,11 @@
             travelPeriods.forEach(period => {
                 const startDate = parseAustrianDate(period.startDate);
                 const endDate = parseAustrianDate(period.endDate);
+                
+                if (!startDate || !endDate) {
+                    console.log('Could not parse dates for period:', period);
+                    return;
+                }
                 
                 // Format dates with weekdays
                 const startFormatted = formatDateWithWeekday(startDate);
@@ -1286,17 +1307,26 @@
                 const travelEnd = findTravelEnd(period.entries);
                 
                 if (travelStart) {
-                    report += `* **Reisebeginn:** ${formatDateWithWeekday(parseAustrianDate(travelStart.date))}, ${travelStart.time} Uhr\n`;
+                    const startDate = parseAustrianDate(travelStart.date);
+                    if (startDate) {
+                        report += `* **Reisebeginn:** ${formatDateWithWeekday(startDate)}, ${travelStart.time} Uhr\n`;
+                    }
                 }
                 
                 // Check for border crossings
                 const borderCrossings = findBorderCrossings(period.entries);
                 borderCrossings.forEach(crossing => {
-                    report += `* **${crossing.type}:** ${formatDateWithWeekday(parseAustrianDate(crossing.date))}, ${crossing.time} Uhr\n`;
+                    const crossingDate = parseAustrianDate(crossing.date);
+                    if (crossingDate) {
+                        report += `* **${crossing.type}:** ${formatDateWithWeekday(crossingDate)}, ${crossing.time} Uhr\n`;
+                    }
                 });
                 
                 if (travelEnd) {
-                    report += `* **Reiseende:** ${formatDateWithWeekday(parseAustrianDate(travelEnd.date))}, ${travelEnd.time} Uhr\n`;
+                    const endDate = parseAustrianDate(travelEnd.date);
+                    if (endDate) {
+                        report += `* **Reiseende:** ${formatDateWithWeekday(endDate)}, ${travelEnd.time} Uhr\n`;
+                    }
                 }
                 
                 report += '\n';
