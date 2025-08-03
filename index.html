@@ -417,6 +417,7 @@
         <div class="tabs">
             <button class="tab active" onclick="switchTab('add')">Add Entry</button>
             <button class="tab" onclick="switchTab('view')">View Entries</button>
+            <button class="tab" onclick="switchTab('report')">Reisekostenabrechnung</button>
             <button class="tab" onclick="switchTab('setup')">Setup</button>
         </div>
         
@@ -492,6 +493,50 @@
                 </div>
             </div>
             
+            <!-- Report Tab -->
+            <div id="report-tab" class="tab-content">
+                <div class="form-group">
+                    <label for="report-month">Monat für Reisekostenabrechnung:</label>
+                    <select id="report-month" required>
+                        <option value="">Monat auswählen...</option>
+                        <option value="01">Januar</option>
+                        <option value="02">Februar</option>
+                        <option value="03">März</option>
+                        <option value="04">April</option>
+                        <option value="05">Mai</option>
+                        <option value="06">Juni</option>
+                        <option value="07">Juli</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Dezember</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="report-year">Jahr:</label>
+                    <input type="number" id="report-year" min="2020" max="2030" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="employee-name">Mitarbeitername:</label>
+                    <input type="text" id="employee-name" placeholder="z.B. Maurice Pannard" required>
+                </div>
+                
+                <button class="btn" onclick="generateTravelReport()" id="generate-report-btn">
+                    📄 Reisekostenabrechnung erstellen (.odt)
+                </button>
+                
+                <div id="report-preview" style="margin-top: 30px; display: none;">
+                    <h3 style="color: #4a90e2; margin-bottom: 20px;">Vorschau der Reisekostenabrechnung:</h3>
+                    <div id="report-content" style="background: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #e9ecef; white-space: pre-wrap; font-family: 'Times New Roman', serif; line-height: 1.6;"></div>
+                    <button class="btn" onclick="downloadODT()" style="margin-top: 20px;">
+                        💾 Als .odt Datei herunterladen
+                    </button>
+                </div>
+            </div>
+            
             <!-- Setup Tab -->
             <div id="setup-tab" class="tab-content">
                 <div class="setup-section">
@@ -555,6 +600,7 @@
         let currentDate = new Date();
         let selectedDate = null;
         let isDatePickerOpen = false;
+        let allEntries = []; // Store all loaded entries for reporting
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -566,6 +612,17 @@
             
             // Initialize date picker
             updateDatePickerDisplay();
+            
+            // Set current month/year for reports
+            document.getElementById('report-month').value = String(now.getMonth() + 1).padStart(2, '0');
+            document.getElementById('report-year').value = now.getFullYear();
+            
+            // Load saved employee name
+            const savedEmployeeName = localStorage.getItem('employeeName') || '';
+            document.getElementById('employee-name').value = savedEmployeeName;
+            document.getElementById('employee-name').addEventListener('change', function() {
+                localStorage.setItem('employeeName', this.value);
+            });
             
             // Close date picker when clicking outside
             document.addEventListener('click', function(e) {
@@ -881,6 +938,9 @@
                 return;
             }
             
+            // Store entries for reporting
+            allEntries = entries;
+            
             const entriesHtml = entries.map(entry => `
                 <div class="entry-item">
                     <div class="entry-date">${entry.date}</div>
@@ -892,6 +952,350 @@
             `).join('');
             
             container.innerHTML = `<div class="entries-list">${entriesHtml}</div>`;
+        }
+        
+        // Generate travel report
+        async function generateTravelReport() {
+            const month = document.getElementById('report-month').value;
+            const year = document.getElementById('report-year').value;
+            const employeeName = document.getElementById('employee-name').value;
+            
+            if (!month || !year || !employeeName) {
+                showMessage('Bitte füllen Sie alle Felder für die Reisekostenabrechnung aus.', 'error');
+                return;
+            }
+            
+            const reportBtn = document.getElementById('generate-report-btn');
+            const originalText = reportBtn.textContent;
+            reportBtn.disabled = true;
+            reportBtn.textContent = 'Generiere Abrechnung...';
+            
+            try {
+                // Load entries if not already loaded
+                if (allEntries.length === 0) {
+                    await loadEntriesForReport();
+                }
+                
+                const monthNames = {
+                    '01': 'Januar', '02': 'Februar', '03': 'März', '04': 'April',
+                    '05': 'Mai', '06': 'Juni', '07': 'Juli', '08': 'August',
+                    '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Dezember'
+                };
+                
+                const reportContent = generateReportContent(allEntries, month, year, employeeName, monthNames[month]);
+                
+                // Show preview
+                document.getElementById('report-content').textContent = reportContent;
+                document.getElementById('report-preview').style.display = 'block';
+                
+                // Store for download
+                window.currentReport = reportContent;
+                
+                showMessage('Reisekostenabrechnung erfolgreich generiert!', 'success');
+                
+            } catch (error) {
+                console.error('Error generating report:', error);
+                showMessage('Fehler beim Generieren der Abrechnung. Bitte prüfen Sie Ihre Konfiguration.', 'error');
+            } finally {
+                reportBtn.disabled = false;
+                reportBtn.textContent = originalText;
+            }
+        }
+        
+        // Load entries specifically for reporting
+        async function loadEntriesForReport() {
+            if (!SHEET_ID || !SCRIPT_URL) {
+                throw new Error('Bitte konfigurieren Sie Ihre Google Sheets Verbindung in den Einstellungen.');
+            }
+            
+            const response = await fetch(`${SCRIPT_URL}?action=getEntries&sheetId=${SHEET_ID}&sheetName=${SHEET_NAME}`);
+            const entries = await response.json();
+            
+            if (Array.isArray(entries)) {
+                allEntries = entries;
+            } else if (entries.error) {
+                throw new Error(entries.error);
+            } else {
+                allEntries = [];
+            }
+        }
+        
+        // Generate report content
+        function generateReportContent(entries, month, year, employeeName, monthName) {
+            // Filter entries for the selected month/year
+            const monthEntries = entries.filter(entry => {
+                if (!entry.date) return false;
+                const parts = entry.date.split('.');
+                if (parts.length !== 3) return false;
+                return parts[1] === month && parts[2] === year;
+            });
+            
+            if (monthEntries.length === 0) {
+                return `Keine Reiseaktivitäten für ${monthName} ${year} gefunden.`;
+            }
+            
+            // Group entries by travel periods (consecutive dates or same project)
+            const travelPeriods = groupIntoTravelPeriods(monthEntries);
+            
+            let report = `Reisekostenabrechnung ${monthName} ${year} für ${employeeName}\n\n`;
+            
+            travelPeriods.forEach(period => {
+                const startDate = parseAustrianDate(period.startDate);
+                const endDate = parseAustrianDate(period.endDate);
+                
+                // Format dates with weekdays
+                const startFormatted = formatDateWithWeekday(startDate);
+                const endFormatted = formatDateWithWeekday(endDate);
+                
+                if (period.startDate === period.endDate) {
+                    report += `**Reisezeitraum: ${startFormatted}**\n`;
+                } else {
+                    report += `**Reisezeitraum: ${startFormatted} – ${endFormatted}**\n`;
+                }
+                
+                // Try to determine project and location from entries
+                const project = extractProjectInfo(period.entries);
+                const location = extractLocationInfo(period.entries);
+                const purpose = extractPurposeInfo(period.entries);
+                
+                if (project || location || purpose) {
+                    report += `**Projekt:** ${project} **Ort / Staat:** ${location} **Reisezweck:** ${purpose}\n`;
+                }
+                
+                // Find travel start and end times
+                const travelStart = findTravelStart(period.entries);
+                const travelEnd = findTravelEnd(period.entries);
+                
+                if (travelStart) {
+                    report += `* **Reisebeginn:** ${formatDateWithWeekday(parseAustrianDate(travelStart.date))}, ${travelStart.time} Uhr\n`;
+                }
+                
+                // Check for border crossings
+                const borderCrossings = findBorderCrossings(period.entries);
+                borderCrossings.forEach(crossing => {
+                    report += `* **${crossing.type}:** ${formatDateWithWeekday(parseAustrianDate(crossing.date))}, ${crossing.time} Uhr\n`;
+                });
+                
+                if (travelEnd) {
+                    report += `* **Reiseende:** ${formatDateWithWeekday(parseAustrianDate(travelEnd.date))}, ${travelEnd.time} Uhr\n`;
+                }
+                
+                report += '\n';
+            });
+            
+            return report;
+        }
+        
+        // Group entries into travel periods
+        function groupIntoTravelPeriods(entries) {
+            // Sort entries by date and time
+            entries.sort((a, b) => {
+                const dateA = parseAustrianDate(a.date);
+                const dateB = parseAustrianDate(b.date);
+                if (dateA.getTime() !== dateB.getTime()) {
+                    return dateA.getTime() - dateB.getTime();
+                }
+                return a.time.localeCompare(b.time);
+            });
+            
+            const periods = [];
+            let currentPeriod = null;
+            
+            entries.forEach(entry => {
+                const entryDate = parseAustrianDate(entry.date);
+                
+                if (!currentPeriod) {
+                    currentPeriod = {
+                        startDate: entry.date,
+                        endDate: entry.date,
+                        entries: [entry]
+                    };
+                } else {
+                    const lastDate = parseAustrianDate(currentPeriod.endDate);
+                    const dayDiff = Math.abs(entryDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24);
+                    
+                    // If more than 3 days gap, start new period
+                    if (dayDiff > 3) {
+                        periods.push(currentPeriod);
+                        currentPeriod = {
+                            startDate: entry.date,
+                            endDate: entry.date,
+                            entries: [entry]
+                        };
+                    } else {
+                        currentPeriod.endDate = entry.date;
+                        currentPeriod.entries.push(entry);
+                    }
+                }
+            });
+            
+            if (currentPeriod) {
+                periods.push(currentPeriod);
+            }
+            
+            return periods;
+        }
+        
+        // Format date with German weekday
+        function formatDateWithWeekday(date) {
+            const weekdays = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+            const weekday = weekdays[date.getDay()];
+            return `${weekday}, ${formatDateAustrian(date)}`;
+        }
+        
+        // Extract project information from entries
+        function extractProjectInfo(entries) {
+            // Look for customer or project names in descriptions and locations
+            const locations = entries.map(e => e.location).filter(l => l);
+            const descriptions = entries.map(e => e.description).filter(d => d);
+            
+            // Try to find a company or project name
+            for (const location of locations) {
+                if (location.toLowerCase().includes('customer') || 
+                    location.toLowerCase().includes('kunde') ||
+                    !location.toLowerCase().includes('hotel') &&
+                    !location.toLowerCase().includes('home') &&
+                    !location.toLowerCase().includes('office')) {
+                    return location;
+                }
+            }
+            
+            return 'Projekt angeben';
+        }
+        
+        // Extract location information
+        function extractLocationInfo(entries) {
+            const workLocations = entries
+                .filter(e => e.activity && e.activity.includes('Work'))
+                .map(e => e.location)
+                .filter(l => l && !l.toLowerCase().includes('hotel') && !l.toLowerCase().includes('home'));
+            
+            if (workLocations.length > 0) {
+                return workLocations[0];
+            }
+            
+            return 'Ort angeben';
+        }
+        
+        // Extract purpose information
+        function extractPurposeInfo(entries) {
+            const workEntries = entries.filter(e => e.activity && e.activity.includes('Work'));
+            if (workEntries.length > 0 && workEntries[0].description) {
+                return workEntries[0].description;
+            }
+            return 'Reisezweck angeben';
+        }
+        
+        // Find travel start
+        function findTravelStart(entries) {
+            const travelEntries = entries.filter(e => 
+                e.activity && (e.activity.includes('Travel - Departure') || 
+                              e.description && e.description.toLowerCase().includes('leaving home'))
+            );
+            
+            if (travelEntries.length > 0) {
+                return travelEntries[0];
+            }
+            
+            // Fallback to first entry of the period
+            return entries[0];
+        }
+        
+        // Find travel end
+        function findTravelEnd(entries) {
+            const travelEntries = entries.filter(e => 
+                e.activity && (e.activity.includes('Travel - Arrival') || 
+                              e.description && e.description.toLowerCase().includes('arrival'))
+            );
+            
+            if (travelEntries.length > 0) {
+                return travelEntries[travelEntries.length - 1];
+            }
+            
+            // Fallback to last entry of the period
+            return entries[entries.length - 1];
+        }
+        
+        // Find border crossings
+        function findBorderCrossings(entries) {
+            const crossings = [];
+            
+            entries.forEach(entry => {
+                if (entry.activity && entry.activity.includes('Flight')) {
+                    // For flights, border crossing is at landing
+                    if (entry.description && entry.description.toLowerCase().includes('landing')) {
+                        crossings.push({
+                            type: 'Grenzübertritt',
+                            date: entry.date,
+                            time: entry.time
+                        });
+                    }
+                } else if (entry.description) {
+                    const desc = entry.description.toLowerCase();
+                    if (desc.includes('grenze') || desc.includes('border') || 
+                        (desc.includes('at-de') || desc.includes('de-at'))) {
+                        let type = 'Grenzübertritt';
+                        if (desc.includes('hinreise') || desc.includes('outbound')) {
+                            type = 'Grenzübertritt Hinreise (AT-DE)';
+                        } else if (desc.includes('rückreise') || desc.includes('return')) {
+                            type = 'Grenzübertritt Rückreise (DE-AT)';
+                        }
+                        
+                        crossings.push({
+                            type: type,
+                            date: entry.date,
+                            time: entry.time
+                        });
+                    }
+                }
+            });
+            
+            return crossings;
+        }
+        
+        // Download as ODT file
+        function downloadODT() {
+            if (!window.currentReport) {
+                showMessage('Bitte generieren Sie zuerst eine Abrechnung.', 'error');
+                return;
+            }
+            
+            // Create ODT content (simplified)
+            const odtContent = createODTContent(window.currentReport);
+            
+            // Create blob and download
+            const blob = new Blob([odtContent], { type: 'application/vnd.oasis.opendocument.text' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            
+            const month = document.getElementById('report-month').value;
+            const year = document.getElementById('report-year').value;
+            const monthNames = {
+                '01': 'Januar', '02': 'Februar', '03': 'März', '04': 'April',
+                '05': 'Mai', '06': 'Juni', '07': 'Juli', '08': 'August',
+                '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Dezember'
+            };
+            
+            a.download = `Reisekostenabrechnung_${monthNames[month]}_${year}.odt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Create simplified ODT content
+        function createODTContent(reportText) {
+            // This is a simplified ODT format - for full compatibility, you'd need a proper ODT library
+            const content = `<?xml version="1.0" encoding="UTF-8"?>
+<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" 
+    xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+    <office:body>
+        <office:text>
+            <text:p text:style-name="Standard">${reportText.replace(/\n/g, '</text:p><text:p text:style-name="Standard">')}</text:p>
+        </office:text>
+    </office:body>
+</office:document-content>`;
+            
+            return content;
         }
         
         // Show message
