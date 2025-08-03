@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -43,16 +44,16 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, 
-                #6c757d 0%, #6c757d 8%, transparent 8%, transparent 12%,
-                #6c757d 12%, #6c757d 20%, transparent 20%, transparent 24%,
-                #6c757d 24%, #6c757d 32%, transparent 32%, transparent 36%,
-                #6c757d 36%, #6c757d 44%, transparent 44%, transparent 48%,
-                #6c757d 48%, #6c757d 56%, transparent 56%, transparent 60%,
-                #6c757d 60%, #6c757d 68%, transparent 68%, transparent 72%,
-                #6c757d 72%, #6c757d 80%, transparent 80%, transparent 84%,
-                #6c757d 84%, #6c757d 92%, transparent 92%, transparent 96%,
-                #6c757d 96%, #6c757d 100%);
+            background: linear-gradient(90deg,
+                    #6c757d 0%, #6c757d 8%, transparent 8%, transparent 12%,
+                    #6c757d 12%, #6c757d 20%, transparent 20%, transparent 24%,
+                    #6c757d 24%, #6c757d 32%, transparent 32%, transparent 36%,
+                    #6c757d 36%, #6c757d 44%, transparent 44%, transparent 48%,
+                    #6c757d 48%, #6c757d 56%, transparent 56%, transparent 60%,
+                    #6c757d 60%, #6c757d 68%, transparent 68%, transparent 72%,
+                    #6c757d 72%, #6c757d 80%, transparent 80%, transparent 84%,
+                    #6c757d 84%, #6c757d 92%, transparent 92%, transparent 96%,
+                    #6c757d 96%, #6c757d 100%);
         }
 
         .logo-container {
@@ -142,7 +143,9 @@
             color: #333;
         }
 
-        input, textarea, select {
+        input,
+        textarea,
+        select {
             width: 100%;
             padding: 12px 15px;
             border: 2px solid #e1e8ed;
@@ -294,7 +297,9 @@
             font-weight: 600;
         }
 
-        input:focus, textarea:focus, select:focus {
+        input:focus,
+        textarea:focus,
+        select:focus {
             outline: none;
             border-color: #4a90e2;
             box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
@@ -340,7 +345,8 @@
             transform: none;
         }
 
-        .success-message, .error-message {
+        .success-message,
+        .error-message {
             padding: 15px;
             border-radius: 10px;
             margin: 20px 0;
@@ -428,43 +434,46 @@
             .form-row {
                 grid-template-columns: 1fr;
             }
-            
+
             .container {
                 margin: 10px;
                 border-radius: 15px;
             }
-            
+
             .header {
                 padding: 20px;
             }
-            
+
             .header h1 {
                 font-size: 1.5rem;
             }
-            
+
             .content {
                 padding: 20px;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
             <div class="logo-container">
-                <img class="cargometer-logo" src="https://raw.githubusercontent.com/Maurice1995/Travel-Work-Log/refs/heads/main/CARGOMETER_Logo_4c-601x298px.png" alt="Cargometer Logo">
+                <img class="cargometer-logo"
+                    src="https://raw.githubusercontent.com/Maurice1995/Travel-Work-Log/refs/heads/main/CARGOMETER_Logo_4c-601x298px.png"
+                    alt="Cargometer Logo">
             </div>
             <h1>Travel Work Log</h1>
             <p>Professional business travel tracking system</p>
         </div>
-        
+
         <div class="tabs">
             <button class="tab active" onclick="switchTab('add')">Add Entry</button>
             <button class="tab" onclick="switchTab('view')">View Entries</button>
             <button class="tab" onclick="switchTab('report')">Reisekostenabrechnung</button>
             <button class="tab" onclick="switchTab('setup')">Setup</button>
         </div>
-        
+
         <div class="content">
             <!-- Add Entry Tab -->
             <div id="add-tab" class="tab-content active">
@@ -493,12 +502,13 @@
                             <input type="time" id="time" name="time" step="300" required>
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="customer">Customer/Project:</label>
-                        <input type="text" id="customer" name="customer" placeholder="e.g., Gebrüder Weiss, BMW Group, Siemens..." required>
+                        <input type="text" id="customer" name="customer"
+                            placeholder="e.g., Gebrüder Weiss, BMW Group, Siemens..." required>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="activity">Activity:</label>
                         <select id="activity" name="activity" required>
@@ -515,33 +525,37 @@
                             <option value="Other">Other</option>
                         </select>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="description">Description:</label>
-                        <textarea id="description" name="description" placeholder="e.g., leaving home driving to work, lunch break, work at customer location..." required></textarea>
+                        <textarea id="description" name="description"
+                            placeholder="e.g., leaving home driving to work, lunch break, work at customer location..."
+                            required></textarea>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="location">Location:</label>
-                        <input type="text" id="location" name="location" placeholder="e.g., Home, Customer Office Munich, Hotel Marriott Berlin..." required>
+                        <input type="text" id="location" name="location"
+                            placeholder="e.g., Home, Customer Office Munich, Hotel Marriott Berlin..." required>
                     </div>
-                    
+
                     <button type="submit" class="btn" id="submit-btn">Add Entry</button>
                 </form>
-                
+
                 <div id="message-area"></div>
             </div>
-            
+
             <!-- View Entries Tab -->
             <div id="view-tab" class="tab-content">
                 <div style="margin-bottom: 20px;">
                     <button class="btn" onclick="loadEntries()">Refresh Entries</button>
                 </div>
                 <div id="entries-container">
-                    <p style="text-align: center; color: #6c757d; padding: 40px;">Click "Refresh Entries" to load your travel log data.</p>
+                    <p style="text-align: center; color: #6c757d; padding: 40px;">Click "Refresh Entries" to load your
+                        travel log data.</p>
                 </div>
             </div>
-            
+
             <!-- Report Tab -->
             <div id="report-tab" class="tab-content">
                 <div class="form-group">
@@ -562,59 +576,66 @@
                         <option value="12">Dezember</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="report-year">Jahr:</label>
                     <input type="number" id="report-year" min="2020" max="2030" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="employee-name">Mitarbeitername:</label>
                     <input type="text" id="employee-name" placeholder="z.B. Maurice Pannard" required>
                 </div>
-                
+
                 <button class="btn" onclick="generateTravelReport()" id="generate-report-btn">
                     📄 Reisekostenabrechnung erstellen (.odt)
                 </button>
-                
+
                 <div id="report-preview" style="margin-top: 30px; display: none;">
                     <h3 style="color: #4a90e2; margin-bottom: 20px;">Vorschau der Reisekostenabrechnung:</h3>
-                    <div id="report-content" style="background: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #e9ecef; white-space: pre-wrap; font-family: 'Times New Roman', serif; line-height: 1.6;"></div>
+                    <div id="report-content"
+                        style="background: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #e9ecef; white-space: pre-wrap; font-family: 'Times New Roman', serif; line-height: 1.6;">
+                    </div>
                     <button class="btn" onclick="downloadODT()" style="margin-top: 20px;">
                         💾 Als .odt Datei herunterladen
                     </button>
                 </div>
             </div>
-            
+
             <!-- Setup Tab -->
             <div id="setup-tab" class="tab-content">
                 <div class="setup-section">
                     <h3>🔧 Initial Setup Required</h3>
                     <p>To use this app, you need to:</p>
                     <ol style="margin-left: 20px; color: #856404;">
-                        <li>Create a Google Sheet with these column headers: <code>Date</code>, <code>Time</code>, <code>Activity</code>, <code>Description</code>, <code>Location</code></li>
+                        <li>Create a Google Sheet with these column headers: <code>Date</code>, <code>Time</code>,
+                            <code>Activity</code>, <code>Description</code>, <code>Location</code>
+                        </li>
                         <li>Share the sheet publicly (anyone with link can edit)</li>
                         <li>Get the sheet ID from the URL and enter it below</li>
                         <li>Deploy this HTML file to GitHub Pages</li>
                     </ol>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="script-url">Google Apps Script URL:</label>
-                    <input type="url" id="script-url" placeholder="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec" onchange="saveScriptUrl()">
+                    <input type="url" id="script-url"
+                        placeholder="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec" onchange="saveScriptUrl()">
                     <small style="color: #6c757d; display: block; margin-top: 5px;">
                         The Web app URL from your deployed Google Apps Script
                     </small>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="sheet-id">Google Sheets ID:</label>
-                    <input type="text" id="sheet-id" placeholder="Enter your Google Sheets ID here..." onchange="saveSheetId()">
+                    <input type="text" id="sheet-id" placeholder="Enter your Google Sheets ID here..."
+                        onchange="saveSheetId()">
                     <small style="color: #6c757d; display: block; margin-top: 5px;">
-                        Find this in your Google Sheets URL: docs.google.com/spreadsheets/d/<strong>YOUR_SHEET_ID</strong>/edit
+                        Find this in your Google Sheets URL:
+                        docs.google.com/spreadsheets/d/<strong>YOUR_SHEET_ID</strong>/edit
                     </small>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="sheet-name">Sheet Name (tab name):</label>
                     <input type="text" id="sheet-name" value="Sheet1" onchange="saveSheetName()">
@@ -622,14 +643,17 @@
                         The name of the tab in your Google Sheet (usually "Sheet1")
                     </small>
                 </div>
-                
+
                 <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 4px;">
                     <h4 style="color: #6c757d; margin-bottom: 10px;">📝 Complete Setup Instructions:</h4>
                     <ol style="color: #6c757d; margin-left: 20px;">
-                        <li><strong>Create Google Sheet:</strong> New sheet with headers: Date, Time, Customer, Activity, Description, Location</li>
+                        <li><strong>Create Google Sheet:</strong> New sheet with headers: Date, Time, Customer,
+                            Activity, Description, Location</li>
                         <li><strong>Share Sheet:</strong> Share → Anyone with the link → Editor</li>
-                        <li><strong>Create Apps Script:</strong> Go to script.google.com → New Project → Paste the provided code</li>
-                        <li><strong>Deploy Script:</strong> Deploy → New deployment → Web app → Execute as "Me" → Access "Anyone" → Deploy</li>
+                        <li><strong>Create Apps Script:</strong> Go to script.google.com → New Project → Paste the
+                            provided code</li>
+                        <li><strong>Deploy Script:</strong> Deploy → New deployment → Web app → Execute as "Me" → Access
+                            "Anyone" → Deploy</li>
                         <li><strong>Copy URLs:</strong> Copy both the Sheet ID and the Apps Script web app URL</li>
                         <li><strong>Configure App:</strong> Paste both URLs above and save</li>
                         <li><strong>Test:</strong> Try adding an entry to verify everything works!</li>
@@ -648,7 +672,7 @@
         let SHEET_ID = localStorage.getItem('sheetId') || '';
         let SHEET_NAME = localStorage.getItem('sheetName') || 'Sheet1';
         let SCRIPT_URL = localStorage.getItem('scriptUrl') || '';
-        
+
         // Date picker variables
         let currentDate = new Date();
         let selectedDate = null;
@@ -656,34 +680,34 @@
         let allEntries = []; // Store all loaded entries for reporting
 
         // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Set current date and time as defaults
             const now = new Date();
             selectedDate = new Date(now);
             document.getElementById('date').value = formatDateAustrian(now);
             setCurrentTimeWith5MinuteStep();
-            
+
             // Initialize date picker
             updateDatePickerDisplay();
-            
+
             // Set current month/year for reports
             document.getElementById('report-month').value = String(now.getMonth() + 1).padStart(2, '0');
             document.getElementById('report-year').value = now.getFullYear();
-            
+
             // Load saved employee name
             const savedEmployeeName = localStorage.getItem('employeeName') || '';
             document.getElementById('employee-name').value = savedEmployeeName;
-            document.getElementById('employee-name').addEventListener('change', function() {
+            document.getElementById('employee-name').addEventListener('change', function () {
                 localStorage.setItem('employeeName', this.value);
             });
-            
+
             // Close date picker when clicking outside
-            document.addEventListener('click', function(e) {
+            document.addEventListener('click', function (e) {
                 if (!e.target.closest('.date-picker-container')) {
                     closeDatePicker();
                 }
             });
-            
+
             // Load saved configuration
             document.getElementById('sheet-id').value = SHEET_ID;
             document.getElementById('sheet-name').value = SHEET_NAME;
@@ -699,44 +723,44 @@
         }
 
         // Parse Austrian date format to Date object - handles multiple formats
-function parseAustrianDate(dateStr) {
-    if (!dateStr) return null;
-    
-    // Clean up the date string
-    let cleanDate = dateStr;
-    if (cleanDate.startsWith("'")) {
-        cleanDate = cleanDate.substring(1);
-    }
-    
-    // Handle different formats
-    if (cleanDate.includes('.')) {
-        // Austrian format DD.MM.YYYY
-        const parts = cleanDate.split('.');
-        if (parts.length === 3) {
-            const day = parseInt(parts[0], 10);
-            const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
-            const year = parseInt(parts[2], 10);
-            return new Date(year, month, day);
-        }
-    } else if (cleanDate.includes('T') || cleanDate.includes('Z') || cleanDate.includes('-')) {
-        // ISO format or timestamp - WICHTIG: Verwende lokale Zeit
-        try {
-            const isoDate = new Date(cleanDate);
-            if (!isNaN(isoDate.getTime())) {
-                // Erstelle ein neues Datum-Objekt mit lokaler Zeit statt UTC
-                const localYear = isoDate.getFullYear();
-                const localMonth = isoDate.getMonth();
-                const localDay = isoDate.getDate();
-                return new Date(localYear, localMonth, localDay);
+        function parseAustrianDate(dateStr) {
+            if (!dateStr) return null;
+
+            // Clean up the date string
+            let cleanDate = dateStr;
+            if (cleanDate.startsWith("'")) {
+                cleanDate = cleanDate.substring(1);
             }
-        } catch (e) {
-            console.log('Could not parse ISO date:', cleanDate);
+
+            // Handle different formats
+            if (cleanDate.includes('.')) {
+                // Austrian format DD.MM.YYYY
+                const parts = cleanDate.split('.');
+                if (parts.length === 3) {
+                    const day = parseInt(parts[0], 10);
+                    const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+                    const year = parseInt(parts[2], 10);
+                    return new Date(year, month, day);
+                }
+            } else if (cleanDate.includes('T') || cleanDate.includes('Z') || cleanDate.includes('-')) {
+                // ISO format or timestamp - WICHTIG: Verwende lokale Zeit
+                try {
+                    const isoDate = new Date(cleanDate);
+                    if (!isNaN(isoDate.getTime())) {
+                        // Erstelle ein neues Datum-Objekt mit lokaler Zeit statt UTC
+                        const localYear = isoDate.getFullYear();
+                        const localMonth = isoDate.getMonth();
+                        const localDay = isoDate.getDate();
+                        return new Date(localYear, localMonth, localDay);
+                    }
+                } catch (e) {
+                    console.log('Could not parse ISO date:', cleanDate);
+                }
+            }
+
+            console.log('Could not parse date:', dateStr);
+            return null;
         }
-    }
-    
-    console.log('Could not parse date:', dateStr);
-    return null;
-}
 
         // Toggle date picker
         function toggleDatePicker() {
@@ -769,10 +793,10 @@ function parseAustrianDate(dateStr) {
                 'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
                 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'
             ];
-            
-            document.getElementById('month-year').textContent = 
+
+            document.getElementById('month-year').textContent =
                 `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-            
+
             generateCalendarDays();
         }
 
@@ -780,18 +804,18 @@ function parseAustrianDate(dateStr) {
         function generateCalendarDays() {
             const daysContainer = document.getElementById('date-picker-days');
             daysContainer.innerHTML = '';
-            
+
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
-            
+
             // First day of the month
             const firstDay = new Date(year, month, 1);
             // Last day of the month
             const lastDay = new Date(year, month + 1, 0);
-            
+
             // Get the day of week for first day (0 = Sunday, but we want Monday = 0)
             let startDay = (firstDay.getDay() + 6) % 7; // Convert to Monday = 0
-            
+
             // Add days from previous month
             const prevMonth = new Date(year, month, 0);
             for (let i = startDay - 1; i >= 0; i--) {
@@ -799,14 +823,14 @@ function parseAustrianDate(dateStr) {
                 const dayElement = createDayElement(day, 'other-month', new Date(year, month - 1, day));
                 daysContainer.appendChild(dayElement);
             }
-            
+
             // Add days of current month
             for (let day = 1; day <= lastDay.getDate(); day++) {
                 const date = new Date(year, month, day);
                 const dayElement = createDayElement(day, '', date);
                 daysContainer.appendChild(dayElement);
             }
-            
+
             // Add days from next month to fill the grid
             const remainingDays = 42 - daysContainer.children.length; // 6 weeks * 7 days
             for (let day = 1; day <= remainingDays; day++) {
@@ -820,23 +844,23 @@ function parseAustrianDate(dateStr) {
             const dayElement = document.createElement('div');
             dayElement.className = `date-picker-day ${className}`;
             dayElement.textContent = day;
-            
+
             // Check if it's today
             const today = new Date();
             if (date.toDateString() === today.toDateString()) {
                 dayElement.classList.add('today');
             }
-            
+
             // Check if it's selected
             if (selectedDate && date.toDateString() === selectedDate.toDateString()) {
                 dayElement.classList.add('selected');
             }
-            
+
             // Add click handler
-            dayElement.addEventListener('click', function() {
+            dayElement.addEventListener('click', function () {
                 selectDate(date);
             });
-            
+
             return dayElement;
         }
 
@@ -844,7 +868,7 @@ function parseAustrianDate(dateStr) {
         function selectDate(date) {
             selectedDate = new Date(date);
             document.getElementById('date').value = formatDateAustrian(date);
-            
+
             // Update current date to selected month if from different month
             if (date.getMonth() !== currentDate.getMonth() || date.getFullYear() !== currentDate.getFullYear()) {
                 currentDate = new Date(date);
@@ -854,7 +878,7 @@ function parseAustrianDate(dateStr) {
                 document.querySelectorAll('.date-picker-day').forEach(el => el.classList.remove('selected'));
                 event.target.classList.add('selected');
             }
-            
+
             closeDatePicker();
         }
 
@@ -863,65 +887,65 @@ function parseAustrianDate(dateStr) {
             const now = new Date();
             let hours = now.getHours();
             let minutes = now.getMinutes();
-            
+
             // Round to nearest 5-minute interval
             minutes = Math.round(minutes / 5) * 5;
-            
+
             // Handle overflow
             if (minutes >= 60) {
                 minutes = 0;
                 hours = (hours + 1) % 24;
             }
-            
+
             const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
             document.getElementById('time').value = timeStr;
         }
-        
+
         // Tab switching
         function switchTab(tabName) {
             // Remove active class from all tabs and content
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
+
             // Add active class to clicked tab and corresponding content
             event.target.classList.add('active');
             document.getElementById(tabName + '-tab').classList.add('active');
         }
-        
+
         // Save configuration
         function saveSheetId() {
             SHEET_ID = document.getElementById('sheet-id').value;
             localStorage.setItem('sheetId', SHEET_ID);
         }
-        
+
         function saveSheetName() {
             SHEET_NAME = document.getElementById('sheet-name').value;
             localStorage.setItem('sheetName', SHEET_NAME);
         }
-        
+
         function saveScriptUrl() {
             SCRIPT_URL = document.getElementById('script-url').value;
             localStorage.setItem('scriptUrl', SCRIPT_URL);
         }
-        
+
         // Form submission
-        document.getElementById('entry-form').addEventListener('submit', async function(e) {
+        document.getElementById('entry-form').addEventListener('submit', async function (e) {
             e.preventDefault();
-            
+
             if (!SHEET_ID) {
                 showMessage('Please configure your Google Sheets ID in the Setup tab first.', 'error');
                 return;
             }
-            
+
             const submitBtn = document.getElementById('submit-btn');
             const originalText = submitBtn.textContent;
-            
+
             submitBtn.disabled = true;
             submitBtn.textContent = 'Adding Entry...';
-            
+
             try {
                 const formData = new FormData(e.target);
-                
+
                 const data = {
                     date: formData.get('date'), // Already in Austrian format DD.MM.YYYY
                     time: formData.get('time'),
@@ -930,18 +954,18 @@ function parseAustrianDate(dateStr) {
                     description: formData.get('description'),
                     location: formData.get('location')
                 };
-                
+
                 await addToGoogleSheets(data);
                 showMessage('Entry added successfully!', 'success');
                 e.target.reset();
-                
+
                 // Reset to current date/time
                 const now = new Date();
                 selectedDate = new Date(now);
                 document.getElementById('date').value = formatDateAustrian(now);
                 setCurrentTimeWith5MinuteStep();
                 updateDatePickerDisplay();
-                
+
             } catch (error) {
                 console.error('Error:', error);
                 showMessage(error.message || 'Failed to add entry. Please check your internet connection and Sheet configuration.', 'error');
@@ -950,15 +974,15 @@ function parseAustrianDate(dateStr) {
                 submitBtn.textContent = originalText;
             }
         });
-        
+
         // Add data to Google Sheets
         async function addToGoogleSheets(data) {
             const SCRIPT_URL = localStorage.getItem('scriptUrl') || '';
-            
+
             if (!SCRIPT_URL) {
                 throw new Error('Please configure your Google Apps Script URL in the Setup tab first.');
             }
-            
+
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors', // Important for Google Apps Script
@@ -972,32 +996,32 @@ function parseAustrianDate(dateStr) {
                     data: data
                 })
             });
-            
+
             // Note: With no-cors mode, we can't check response status
             // The script will assume success if no error is thrown
         }
-        
+
         // Load entries from Google Sheets
         async function loadEntries() {
             if (!SHEET_ID) {
                 showMessage('Please configure your Google Sheets ID in the Setup tab first.', 'error');
                 return;
             }
-            
+
             const SCRIPT_URL = localStorage.getItem('scriptUrl') || '';
-            
+
             if (!SCRIPT_URL) {
                 showMessage('Please configure your Google Apps Script URL in the Setup tab first.', 'error');
                 return;
             }
-            
+
             const container = document.getElementById('entries-container');
             container.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px;">Loading entries...</p>';
-            
+
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=getEntries&sheetId=${SHEET_ID}&sheetName=${SHEET_NAME}`);
                 const entries = await response.json();
-                
+
                 if (Array.isArray(entries)) {
                     displayEntries(entries);
                 } else if (entries.error) {
@@ -1010,39 +1034,39 @@ function parseAustrianDate(dateStr) {
                 container.innerHTML = '<p style="text-align: center; color: #dc3545; padding: 40px;">Failed to load entries. Please check your configuration and try again.</p>';
             }
         }
-        
+
         // Display entries
         function displayEntries(entries) {
             const container = document.getElementById('entries-container');
-            
+
             if (!entries || entries.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px;">No entries found.</p>';
                 return;
             }
-            
+
             // Store entries for reporting
             allEntries = entries;
-            
+
             // Sort entries by date and time (newest first)
             const sortedEntries = entries.sort((a, b) => {
                 const dateA = parseAustrianDate(a.date);
                 const dateB = parseAustrianDate(b.date);
-                
+
                 if (!dateA || !dateB) return 0;
-                
+
                 if (dateA.getTime() !== dateB.getTime()) {
                     return dateB.getTime() - dateA.getTime(); // Newest first
                 }
-                
+
                 // If same date, sort by time
                 return (b.time || '').localeCompare(a.time || '');
             });
-            
+
             const entriesHtml = sortedEntries.map(entry => {
                 // Clean and format the data properly
                 let cleanDate = entry.date || '';
                 let cleanTime = entry.time || '';
-                
+
                 // Fix date format if it's in ISO format
                 if (cleanDate.includes('T') || cleanDate.includes('Z')) {
                     try {
@@ -1054,7 +1078,7 @@ function parseAustrianDate(dateStr) {
                         // Keep original if parsing fails
                     }
                 }
-                
+
                 // Fix time format if it's in ISO format
                 if (cleanTime.includes('T') || cleanTime.includes('Z')) {
                     try {
@@ -1066,17 +1090,17 @@ function parseAustrianDate(dateStr) {
                         // Keep original if parsing fails
                     }
                 }
-                
+
                 // If time is still weird, try to extract from a combined datetime
                 if (cleanTime.includes('1899') || cleanTime.length > 8) {
                     cleanTime = cleanTime.substring(11, 16) || cleanTime.substring(0, 5) || 'Invalid time';
                 }
-                
+
                 const cleanCustomer = entry.customer || '';
                 const cleanActivity = entry.activity || '';
                 const cleanDescription = entry.description || '';
                 const cleanLocation = entry.location || '';
-                
+
                 return `
                     <div class="entry-item">
                         <div class="entry-date">${cleanDate}</div>
@@ -1088,49 +1112,49 @@ function parseAustrianDate(dateStr) {
                     </div>
                 `;
             }).join('');
-            
+
             container.innerHTML = `<div class="entries-list">${entriesHtml}</div>`;
         }
-        
+
         // Generate travel report
         async function generateTravelReport() {
             const month = document.getElementById('report-month').value;
             const year = document.getElementById('report-year').value;
             const employeeName = document.getElementById('employee-name').value;
-            
+
             if (!month || !year || !employeeName) {
                 showMessage('Bitte füllen Sie alle Felder für die Reisekostenabrechnung aus.', 'error');
                 return;
             }
-            
+
             const reportBtn = document.getElementById('generate-report-btn');
             const originalText = reportBtn.textContent;
             reportBtn.disabled = true;
             reportBtn.textContent = 'Generiere Abrechnung...';
-            
+
             try {
                 // Load entries if not already loaded
                 if (allEntries.length === 0) {
                     await loadEntriesForReport();
                 }
-                
+
                 const monthNames = {
                     '01': 'Januar', '02': 'Februar', '03': 'März', '04': 'April',
                     '05': 'Mai', '06': 'Juni', '07': 'Juli', '08': 'August',
                     '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Dezember'
                 };
-                
+
                 const reportContent = generateReportContent(allEntries, month, year, employeeName, monthNames[month]);
-                
+
                 // Show preview
                 document.getElementById('report-content').textContent = reportContent;
                 document.getElementById('report-preview').style.display = 'block';
-                
+
                 // Store for download
                 window.currentReport = reportContent;
-                
+
                 showMessage('Reisekostenabrechnung erfolgreich generiert!', 'success');
-                
+
             } catch (error) {
                 console.error('Error generating report:', error);
                 showMessage('Fehler beim Generieren der Abrechnung. Bitte prüfen Sie Ihre Konfiguration.', 'error');
@@ -1139,16 +1163,16 @@ function parseAustrianDate(dateStr) {
                 reportBtn.textContent = originalText;
             }
         }
-        
+
         // Load entries specifically for reporting
         async function loadEntriesForReport() {
             if (!SHEET_ID || !SCRIPT_URL) {
                 throw new Error('Bitte konfigurieren Sie Ihre Google Sheets Verbindung in den Einstellungen.');
             }
-            
+
             const response = await fetch(`${SCRIPT_URL}?action=getEntries&sheetId=${SHEET_ID}&sheetName=${SHEET_NAME}`);
             const entries = await response.json();
-            
+
             if (Array.isArray(entries)) {
                 allEntries = entries;
             } else if (entries.error) {
@@ -1157,247 +1181,144 @@ function parseAustrianDate(dateStr) {
                 allEntries = [];
             }
         }
-        
+
         // Generate report content
         function generateReportContent(entries, month, year, employeeName, monthName) {
-    console.log('=== REPORT GENERATION START ===');
-    console.log('Target month/year:', month, year);
-    console.log('All entries received:', entries);
-    
-    // Filter entries for the selected month/year
-    const monthEntries = entries.filter(entry => {
-        if (!entry.date) {
-            console.log('Entry has no date:', entry);
-            return false;
-        }
-        
-        let entryDate = entry.date;
-        console.log('Processing entry date:', entryDate);
-        
-        // Clean up the date if it has extra characters or formatting
-        if (entryDate.startsWith("'")) {
-            entryDate = entryDate.substring(1);
-        }
-        
-        // Parse the date to extract month and year
-        let entryMonth, entryYear;
-        
-        if (entryDate.includes('.')) {
-            // Austrian format DD.MM.YYYY
-            const dateParts = entryDate.split('.');
-            if (dateParts.length === 3) {
-                entryMonth = dateParts[1].padStart(2, '0');
-                entryYear = dateParts[2];
-            }
-        } else if (entryDate.includes('T') || entryDate.includes('Z') || entryDate.includes('-')) {
-            // ISO format or timestamp - KORRIGIERT: Verwende lokale Zeit statt UTC
-            try {
-                const isoDate = new Date(entryDate);
-                if (!isNaN(isoDate.getTime())) {
-                    // WICHTIG: Verwende lokale Zeit (getMonth/getFullYear) nicht UTC-Zeit
-                    entryMonth = String(isoDate.getMonth() + 1).padStart(2, '0');
-                    entryYear = String(isoDate.getFullYear());
-                    
-                    console.log(`ISO Date: ${entryDate} -> Local: ${isoDate.toLocaleDateString('de-AT')} -> Month: ${entryMonth}, Year: ${entryYear}`);
+            console.log('=== REPORT GENERATION START ===');
+            console.log('Target month/year:', month, year);
+            console.log('All entries received:', entries);
+
+            // Filter entries for the selected month/year
+            const monthEntries = entries.filter(entry => {
+                if (!entry.date) {
+                    console.log('Entry has no date:', entry);
+                    return false;
                 }
-            } catch (e) {
-                console.log('Could not parse ISO date:', entryDate, e);
-                return false;
-            }
-        } else {
-            console.log('Unknown date format:', entryDate);
-            return false;
-        }
-        
-        // Convert filter values to strings for comparison
-        const targetMonth = String(month).padStart(2, '0');
-        const targetYear = String(year);
-        
-        const matches = entryMonth === targetMonth && entryYear === targetYear;
-        console.log(`Entry: ${entryDate} -> Month: ${entryMonth}, Year: ${entryYear} | Target: ${targetMonth}/${targetYear} | Matches: ${matches}`);
-        
-        return matches;
-    });
-    
-    console.log(`=== FILTER COMPLETE: Found ${monthEntries.length} matching entries ===`);
-    console.log('Matching entries:', monthEntries);
-    
-    if (monthEntries.length === 0) {
-        // Verbesserte Debug-Informationen
-        const debugInfo = entries.map(e => {
-            if (!e.date) return 'No date';
-            
-            let entryDate = e.date;
-            if (entryDate.startsWith("'")) {
-                entryDate = entryDate.substring(1);
-            }
-            
-            let parsedInfo = '';
-            if (entryDate.includes('T') || entryDate.includes('Z')) {
-                try {
-                    const isoDate = new Date(entryDate);
-                    // Verwende lokale Zeit für Debug-Ausgabe
-                    const month = String(isoDate.getMonth() + 1).padStart(2, '0');
-                    const year = String(isoDate.getFullYear());
-                    const localDateStr = isoDate.toLocaleDateString('de-AT');
-                    parsedInfo = ` (${month}/${year} - Lokal: ${localDateStr})`;
-                } catch (err) {
-                    parsedInfo = ' (parse error)';
+
+                let entryDate = entry.date;
+                console.log('Processing entry date:', entryDate);
+
+                // Clean up the date if it has extra characters or formatting
+                if (entryDate.startsWith("'")) {
+                    entryDate = entryDate.substring(1);
                 }
-            } else if (entryDate.includes('.')) {
-                const parts = entryDate.split('.');
-                if (parts.length === 3) {
-                    parsedInfo = ` (${parts[1]}/${parts[2]})`;
+
+                // Parse the date to extract month and year
+                let entryMonth, entryYear;
+
+                if (entryDate.includes('.')) {
+                    // Austrian format DD.MM.YYYY
+                    const dateParts = entryDate.split('.');
+                    if (dateParts.length === 3) {
+                        entryMonth = dateParts[1].padStart(2, '0');
+                        entryYear = dateParts[2];
+                    }
+                } else if (entryDate.includes('T') || entryDate.includes('Z') || entryDate.includes('-')) {
+                    // ISO format or timestamp - KORRIGIERT: Verwende lokale Zeit statt UTC
+                    try {
+                        const isoDate = new Date(entryDate);
+                        if (!isNaN(isoDate.getTime())) {
+                            // WICHTIG: Verwende lokale Zeit (getMonth/getFullYear) nicht UTC-Zeit
+                            entryMonth = String(isoDate.getMonth() + 1).padStart(2, '0');
+                            entryYear = String(isoDate.getFullYear());
+
+                            console.log(`ISO Date: ${entryDate} -> Local: ${isoDate.toLocaleDateString('de-AT')} -> Month: ${entryMonth}, Year: ${entryYear}`);
+                        }
+                    } catch (e) {
+                        console.log('Could not parse ISO date:', entryDate, e);
+                        return false;
+                    }
+                } else {
+                    console.log('Unknown date format:', entryDate);
+                    return false;
                 }
-            }
-            
-            return entryDate + parsedInfo;
-        }).filter(d => d);
-        
-        return `Keine Reiseaktivitäten für ${monthName} ${year} gefunden.\n\nDebug - Verfügbare Daten (lokale Zeit):\n${debugInfo.join('\n')}\n\nSuchkriterium: Monat=${String(month).padStart(2, '0')}, Jahr=${String(year)}`;
-    }
-    
-    // Rest der Funktion bleibt gleich...
-    const travelPeriods = groupIntoTravelPeriods(monthEntries);
-    console.log('Travel periods:', travelPeriods);
-    
-    let report = `Reisekostenabrechnung ${monthName} ${year} für ${employeeName}\n\n`;
-    
-    travelPeriods.forEach((period, index) => {
-        console.log(`Processing period ${index + 1}:`, period);
-        
-        const startDate = parseAustrianDate(period.startDate);
-        const endDate = parseAustrianDate(period.endDate);
-        
-        if (!startDate || !endDate) {
-            console.log('Could not parse dates for period:', period);
-            return;
-        }
-        
-        // Format dates with weekdays
-        const startFormatted = formatDateWithWeekday(startDate);
-        const endFormatted = formatDateWithWeekday(endDate);
-        
-        if (period.startDate === period.endDate) {
-            report += `**Reisezeitraum: ${startFormatted}**\n`;
-        } else {
-            report += `**Reisezeitraum: ${startFormatted} – ${endFormatted}**\n`;
-        }
-        
-        // Try to determine project and location from entries
-        const project = extractProjectInfo(period.entries);
-        const location = extractLocationInfo(period.entries);
-        const purpose = extractPurposeInfo(period.entries);
-        
-        report += `**Projekt:** ${project} **Ort / Staat:** ${location} **Reisezweck:** ${purpose}\n`;
-        
-        // Find travel start and end times
-        const travelStart = findTravelStart(period.entries);
-        const travelEnd = findTravelEnd(period.entries);
-        
-        if (travelStart) {
-            const startDate = parseAustrianDate(travelStart.date);
-            if (startDate) {
-                let cleanTime = cleanTimeValue(travelStart.time);
-                report += `* **Reisebeginn:** ${formatDateWithWeekday(startDate)}, ${cleanTime} Uhr\n`;
-            }
-        }
-        
-        // Check for border crossings
-        const borderCrossings = findBorderCrossings(period.entries);
-        borderCrossings.forEach(crossing => {
-            const crossingDate = parseAustrianDate(crossing.date);
-            if (crossingDate) {
-                let cleanTime = cleanTimeValue(crossing.time);
-                report += `* **${crossing.type}:** ${formatDateWithWeekday(crossingDate)}, ${cleanTime} Uhr\n`;
-            }
-        });
-        
-        if (travelEnd) {
-            const endDate = parseAustrianDate(travelEnd.date);
-            if (endDate) {
-                let cleanTime = cleanTimeValue(travelEnd.time);
-                report += `* **Reiseende:** ${formatDateWithWeekday(endDate)}, ${cleanTime} Uhr\n`;
-            }
-        }
-        
-        report += '\n';
-    });
-    
-    console.log('=== GENERATED REPORT ===');
-    console.log(report);
-    return report;
-}
-            
+
+                // Convert filter values to strings for comparison
+                const targetMonth = String(month).padStart(2, '0');
+                const targetYear = String(year);
+
+                const matches = entryMonth === targetMonth && entryYear === targetYear;
+                console.log(`Entry: ${entryDate} -> Month: ${entryMonth}, Year: ${entryYear} | Target: ${targetMonth}/${targetYear} | Matches: ${matches}`);
+
+                return matches;
+            });
+
             console.log(`=== FILTER COMPLETE: Found ${monthEntries.length} matching entries ===`);
             console.log('Matching entries:', monthEntries);
-            
+
             if (monthEntries.length === 0) {
-                // Debug: Show what dates we found and how they were parsed
+                // Verbesserte Debug-Informationen
                 const debugInfo = entries.map(e => {
                     if (!e.date) return 'No date';
-                    
+
+                    let entryDate = e.date;
+                    if (entryDate.startsWith("'")) {
+                        entryDate = entryDate.substring(1);
+                    }
+
                     let parsedInfo = '';
-                    if (e.date.includes('T') || e.date.includes('Z')) {
+                    if (entryDate.includes('T') || entryDate.includes('Z')) {
                         try {
-                            const isoDate = new Date(e.date);
+                            const isoDate = new Date(entryDate);
+                            // Verwende lokale Zeit für Debug-Ausgabe
                             const month = String(isoDate.getMonth() + 1).padStart(2, '0');
                             const year = String(isoDate.getFullYear());
-                            parsedInfo = ` (${month}/${year})`;
+                            const localDateStr = isoDate.toLocaleDateString('de-AT');
+                            parsedInfo = ` (${month}/${year} - Lokal: ${localDateStr})`;
                         } catch (err) {
                             parsedInfo = ' (parse error)';
                         }
-                    } else if (e.date.includes('.')) {
-                        const parts = e.date.split('.');
+                    } else if (entryDate.includes('.')) {
+                        const parts = entryDate.split('.');
                         if (parts.length === 3) {
                             parsedInfo = ` (${parts[1]}/${parts[2]})`;
                         }
                     }
-                    
-                    return e.date + parsedInfo;
+
+                    return entryDate + parsedInfo;
                 }).filter(d => d);
-                
-                return `Keine Reiseaktivitäten für ${monthName} ${year} gefunden.\n\nDebug - Verfügbare Daten:\n${debugInfo.join('\n')}\n\nSuchkriterium: Monat=${String(month).padStart(2, '0')}, Jahr=${String(year)}`;
+
+                return `Keine Reiseaktivitäten für ${monthName} ${year} gefunden.\n\nDebug - Verfügbare Daten (lokale Zeit):\n${debugInfo.join('\n')}\n\nSuchkriterium: Monat=${String(month).padStart(2, '0')}, Jahr=${String(year)}`;
             }
-            
-            // Group entries by travel periods (consecutive dates or same project)
+
+            // Rest der Funktion bleibt gleich...
             const travelPeriods = groupIntoTravelPeriods(monthEntries);
             console.log('Travel periods:', travelPeriods);
-            
+
             let report = `Reisekostenabrechnung ${monthName} ${year} für ${employeeName}\n\n`;
-            
+
             travelPeriods.forEach((period, index) => {
                 console.log(`Processing period ${index + 1}:`, period);
-                
+
                 const startDate = parseAustrianDate(period.startDate);
                 const endDate = parseAustrianDate(period.endDate);
-                
+
                 if (!startDate || !endDate) {
                     console.log('Could not parse dates for period:', period);
                     return;
                 }
-                
+
                 // Format dates with weekdays
                 const startFormatted = formatDateWithWeekday(startDate);
                 const endFormatted = formatDateWithWeekday(endDate);
-                
+
                 if (period.startDate === period.endDate) {
                     report += `**Reisezeitraum: ${startFormatted}**\n`;
                 } else {
                     report += `**Reisezeitraum: ${startFormatted} – ${endFormatted}**\n`;
                 }
-                
+
                 // Try to determine project and location from entries
                 const project = extractProjectInfo(period.entries);
                 const location = extractLocationInfo(period.entries);
                 const purpose = extractPurposeInfo(period.entries);
-                
+
                 report += `**Projekt:** ${project} **Ort / Staat:** ${location} **Reisezweck:** ${purpose}\n`;
-                
+
                 // Find travel start and end times
                 const travelStart = findTravelStart(period.entries);
                 const travelEnd = findTravelEnd(period.entries);
-                
+
                 if (travelStart) {
                     const startDate = parseAustrianDate(travelStart.date);
                     if (startDate) {
@@ -1405,7 +1326,7 @@ function parseAustrianDate(dateStr) {
                         report += `* **Reisebeginn:** ${formatDateWithWeekday(startDate)}, ${cleanTime} Uhr\n`;
                     }
                 }
-                
+
                 // Check for border crossings
                 const borderCrossings = findBorderCrossings(period.entries);
                 borderCrossings.forEach(crossing => {
@@ -1415,7 +1336,7 @@ function parseAustrianDate(dateStr) {
                         report += `* **${crossing.type}:** ${formatDateWithWeekday(crossingDate)}, ${cleanTime} Uhr\n`;
                     }
                 });
-                
+
                 if (travelEnd) {
                     const endDate = parseAustrianDate(travelEnd.date);
                     if (endDate) {
@@ -1423,24 +1344,127 @@ function parseAustrianDate(dateStr) {
                         report += `* **Reiseende:** ${formatDateWithWeekday(endDate)}, ${cleanTime} Uhr\n`;
                     }
                 }
-                
+
                 report += '\n';
             });
-            
+
             console.log('=== GENERATED REPORT ===');
             console.log(report);
             return report;
         }
-        
+
+        console.log(`=== FILTER COMPLETE: Found ${monthEntries.length} matching entries ===`);
+        console.log('Matching entries:', monthEntries);
+
+        if (monthEntries.length === 0) {
+            // Debug: Show what dates we found and how they were parsed
+            const debugInfo = entries.map(e => {
+                if (!e.date) return 'No date';
+
+                let parsedInfo = '';
+                if (e.date.includes('T') || e.date.includes('Z')) {
+                    try {
+                        const isoDate = new Date(e.date);
+                        const month = String(isoDate.getMonth() + 1).padStart(2, '0');
+                        const year = String(isoDate.getFullYear());
+                        parsedInfo = ` (${month}/${year})`;
+                    } catch (err) {
+                        parsedInfo = ' (parse error)';
+                    }
+                } else if (e.date.includes('.')) {
+                    const parts = e.date.split('.');
+                    if (parts.length === 3) {
+                        parsedInfo = ` (${parts[1]}/${parts[2]})`;
+                    }
+                }
+
+                return e.date + parsedInfo;
+            }).filter(d => d);
+
+            return `Keine Reiseaktivitäten für ${monthName} ${year} gefunden.\n\nDebug - Verfügbare Daten:\n${debugInfo.join('\n')}\n\nSuchkriterium: Monat=${String(month).padStart(2, '0')}, Jahr=${String(year)}`;
+        }
+
+        // Group entries by travel periods (consecutive dates or same project)
+        const travelPeriods = groupIntoTravelPeriods(monthEntries);
+        console.log('Travel periods:', travelPeriods);
+
+        let report = `Reisekostenabrechnung ${monthName} ${year} für ${employeeName}\n\n`;
+
+        travelPeriods.forEach((period, index) => {
+            console.log(`Processing period ${index + 1}:`, period);
+
+            const startDate = parseAustrianDate(period.startDate);
+            const endDate = parseAustrianDate(period.endDate);
+
+            if (!startDate || !endDate) {
+                console.log('Could not parse dates for period:', period);
+                return;
+            }
+
+            // Format dates with weekdays
+            const startFormatted = formatDateWithWeekday(startDate);
+            const endFormatted = formatDateWithWeekday(endDate);
+
+            if (period.startDate === period.endDate) {
+                report += `**Reisezeitraum: ${startFormatted}**\n`;
+            } else {
+                report += `**Reisezeitraum: ${startFormatted} – ${endFormatted}**\n`;
+            }
+
+            // Try to determine project and location from entries
+            const project = extractProjectInfo(period.entries);
+            const location = extractLocationInfo(period.entries);
+            const purpose = extractPurposeInfo(period.entries);
+
+            report += `**Projekt:** ${project} **Ort / Staat:** ${location} **Reisezweck:** ${purpose}\n`;
+
+            // Find travel start and end times
+            const travelStart = findTravelStart(period.entries);
+            const travelEnd = findTravelEnd(period.entries);
+
+            if (travelStart) {
+                const startDate = parseAustrianDate(travelStart.date);
+                if (startDate) {
+                    let cleanTime = cleanTimeValue(travelStart.time);
+                    report += `* **Reisebeginn:** ${formatDateWithWeekday(startDate)}, ${cleanTime} Uhr\n`;
+                }
+            }
+
+            // Check for border crossings
+            const borderCrossings = findBorderCrossings(period.entries);
+            borderCrossings.forEach(crossing => {
+                const crossingDate = parseAustrianDate(crossing.date);
+                if (crossingDate) {
+                    let cleanTime = cleanTimeValue(crossing.time);
+                    report += `* **${crossing.type}:** ${formatDateWithWeekday(crossingDate)}, ${cleanTime} Uhr\n`;
+                }
+            });
+
+            if (travelEnd) {
+                const endDate = parseAustrianDate(travelEnd.date);
+                if (endDate) {
+                    let cleanTime = cleanTimeValue(travelEnd.time);
+                    report += `* **Reiseende:** ${formatDateWithWeekday(endDate)}, ${cleanTime} Uhr\n`;
+                }
+            }
+
+            report += '\n';
+        });
+
+        console.log('=== GENERATED REPORT ===');
+        console.log(report);
+        return report;
+    
+
         // Clean time values from various formats
         function cleanTimeValue(timeStr) {
             if (!timeStr) return '00:00';
-            
+
             // If it's already in HH:MM format
             if (/^\d{2}:\d{2}$/.test(timeStr)) {
                 return timeStr;
             }
-            
+
             // If it contains date info, extract time
             if (timeStr.includes('T') || timeStr.includes('Z') || timeStr.includes('1899')) {
                 try {
@@ -1456,10 +1480,10 @@ function parseAustrianDate(dateStr) {
                     }
                 }
             }
-            
+
             return timeStr;
         }
-        
+
         // Group entries into travel periods
         function groupIntoTravelPeriods(entries) {
             // Sort entries by date and time
@@ -1471,13 +1495,13 @@ function parseAustrianDate(dateStr) {
                 }
                 return a.time.localeCompare(b.time);
             });
-            
+
             const periods = [];
             let currentPeriod = null;
-            
+
             entries.forEach(entry => {
                 const entryDate = parseAustrianDate(entry.date);
-                
+
                 if (!currentPeriod) {
                     currentPeriod = {
                         startDate: entry.date,
@@ -1487,7 +1511,7 @@ function parseAustrianDate(dateStr) {
                 } else {
                     const lastDate = parseAustrianDate(currentPeriod.endDate);
                     const dayDiff = Math.abs(entryDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24);
-                    
+
                     // If more than 3 days gap, start new period
                     if (dayDiff > 3) {
                         periods.push(currentPeriod);
@@ -1502,39 +1526,39 @@ function parseAustrianDate(dateStr) {
                     }
                 }
             });
-            
+
             if (currentPeriod) {
                 periods.push(currentPeriod);
             }
-            
+
             return periods;
         }
-        
+
         // Format date with German weekday
         function formatDateWithWeekday(date) {
             const weekdays = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
             const weekday = weekdays[date.getDay()];
             return `${weekday}, ${formatDateAustrian(date)}`;
         }
-        
+
         // Extract project information from entries
         function extractProjectInfo(entries) {
             // First try to get customer info from the customer field
             const customers = entries
                 .map(e => e.customer)
                 .filter(c => c && c.trim() !== '');
-            
+
             if (customers.length > 0) {
                 return customers[0]; // Use first customer found
             }
-            
+
             // Fallback: Look for customer or project names in descriptions and locations
             const locations = entries.map(e => e.location).filter(l => l);
             const descriptions = entries.map(e => e.description).filter(d => d);
-            
+
             // Try to find a company or project name
             for (const location of locations) {
-                if (location.toLowerCase().includes('customer') || 
+                if (location.toLowerCase().includes('customer') ||
                     location.toLowerCase().includes('kunde') ||
                     !location.toLowerCase().includes('hotel') &&
                     !location.toLowerCase().includes('home') &&
@@ -1542,24 +1566,24 @@ function parseAustrianDate(dateStr) {
                     return location;
                 }
             }
-            
+
             return 'Projekt angeben';
         }
-        
+
         // Extract location information
         function extractLocationInfo(entries) {
             const workLocations = entries
                 .filter(e => e.activity && e.activity.includes('Work'))
                 .map(e => e.location)
                 .filter(l => l && !l.toLowerCase().includes('hotel') && !l.toLowerCase().includes('home'));
-            
+
             if (workLocations.length > 0) {
                 return workLocations[0];
             }
-            
+
             return 'Ort angeben';
         }
-        
+
         // Extract purpose information
         function extractPurposeInfo(entries) {
             const workEntries = entries.filter(e => e.activity && e.activity.includes('Work'));
@@ -1568,41 +1592,41 @@ function parseAustrianDate(dateStr) {
             }
             return 'Reisezweck angeben';
         }
-        
+
         // Find travel start
         function findTravelStart(entries) {
-            const travelEntries = entries.filter(e => 
-                e.activity && (e.activity.includes('Travel - Departure') || 
-                              e.description && e.description.toLowerCase().includes('leaving home'))
+            const travelEntries = entries.filter(e =>
+                e.activity && (e.activity.includes('Travel - Departure') ||
+                    e.description && e.description.toLowerCase().includes('leaving home'))
             );
-            
+
             if (travelEntries.length > 0) {
                 return travelEntries[0];
             }
-            
+
             // Fallback to first entry of the period
             return entries[0];
         }
-        
+
         // Find travel end
         function findTravelEnd(entries) {
-            const travelEntries = entries.filter(e => 
-                e.activity && (e.activity.includes('Travel - Arrival') || 
-                              e.description && e.description.toLowerCase().includes('arrival'))
+            const travelEntries = entries.filter(e =>
+                e.activity && (e.activity.includes('Travel - Arrival') ||
+                    e.description && e.description.toLowerCase().includes('arrival'))
             );
-            
+
             if (travelEntries.length > 0) {
                 return travelEntries[travelEntries.length - 1];
             }
-            
+
             // Fallback to last entry of the period
             return entries[entries.length - 1];
         }
-        
+
         // Find border crossings
         function findBorderCrossings(entries) {
             const crossings = [];
-            
+
             entries.forEach(entry => {
                 if (entry.activity && entry.activity.includes('Flight')) {
                     // For flights, border crossing is at landing
@@ -1615,7 +1639,7 @@ function parseAustrianDate(dateStr) {
                     }
                 } else if (entry.description) {
                     const desc = entry.description.toLowerCase();
-                    if (desc.includes('grenze') || desc.includes('border') || 
+                    if (desc.includes('grenze') || desc.includes('border') ||
                         (desc.includes('at-de') || desc.includes('de-at'))) {
                         let type = 'Grenzübertritt';
                         if (desc.includes('hinreise') || desc.includes('outbound')) {
@@ -1623,7 +1647,7 @@ function parseAustrianDate(dateStr) {
                         } else if (desc.includes('rückreise') || desc.includes('return')) {
                             type = 'Grenzübertritt Rückreise (DE-AT)';
                         }
-                        
+
                         crossings.push({
                             type: type,
                             date: entry.date,
@@ -1632,26 +1656,26 @@ function parseAustrianDate(dateStr) {
                     }
                 }
             });
-            
+
             return crossings;
         }
-        
+
         // Download as ODT file
         function downloadODT() {
             if (!window.currentReport) {
                 showMessage('Bitte generieren Sie zuerst eine Abrechnung.', 'error');
                 return;
             }
-            
+
             // Create ODT content (simplified)
             const odtContent = createODTContent(window.currentReport);
-            
+
             // Create blob and download
             const blob = new Blob([odtContent], { type: 'application/vnd.oasis.opendocument.text' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            
+
             const month = document.getElementById('report-month').value;
             const year = document.getElementById('report-year').value;
             const monthNames = {
@@ -1659,12 +1683,12 @@ function parseAustrianDate(dateStr) {
                 '05': 'Mai', '06': 'Juni', '07': 'Juli', '08': 'August',
                 '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Dezember'
             };
-            
+
             a.download = `Reisekostenabrechnung_${monthNames[month]}_${year}.odt`;
             a.click();
             URL.revokeObjectURL(url);
         }
-        
+
         // Create proper ODT content with real formatting
         function createODTContent(reportText) {
             // Create a proper ODT file structure
@@ -1738,16 +1762,17 @@ function parseAustrianDate(dateStr) {
             // In a real implementation, you'd create a proper ZIP file with all components
             return contentContent;
         }
-        
+
         // Show message
         function showMessage(message, type) {
             const messageArea = document.getElementById('message-area');
             messageArea.innerHTML = `<div class="${type}-message">${message}</div>`;
-            
+
             setTimeout(() => {
                 messageArea.innerHTML = '';
             }, 5000);
         }
     </script>
 </body>
+
 </html>
