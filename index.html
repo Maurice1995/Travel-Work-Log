@@ -735,14 +735,34 @@
 
         // Parse Austrian date format to Date object
         function parseAustrianDate(dateStr) {
-            const parts = dateStr.split('.');
-            if (parts.length !== 3) return null;
+            if (!dateStr) return null;
             
-            const day = parseInt(parts[0], 10);
-            const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
-            const year = parseInt(parts[2], 10);
+            // Clean up the date string
+            let cleanDate = dateStr;
+            if (cleanDate.startsWith("'")) {
+                cleanDate = cleanDate.substring(1);
+            }
             
-            return new Date(year, month, day);
+            // Handle different formats
+            if (cleanDate.includes('.')) {
+                // Austrian format DD.MM.YYYY
+                const parts = cleanDate.split('.');
+                if (parts.length === 3) {
+                    const day = parseInt(parts[0], 10);
+                    const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+                    const year = parseInt(parts[2], 10);
+                    return new Date(year, month, day);
+                }
+            } else if (cleanDate.includes('T') || cleanDate.includes('Z') || cleanDate.includes('-')) {
+                // ISO format or timestamp
+                try {
+                    return new Date(cleanDate);
+                } catch (e) {
+                    console.log('Could not parse ISO date:', cleanDate);
+                }
+            }
+            
+            return null;
         }
 
         // Toggle date picker
@@ -1170,13 +1190,67 @@
             // Filter entries for the selected month/year
             const monthEntries = entries.filter(entry => {
                 if (!entry.date) return false;
-                const parts = entry.date.split('.');
-                if (parts.length !== 3) return false;
-                return parts[1] === month && parts[2] === year;
+                
+                let entryDate = entry.date;
+                
+                // Clean up the date if it has extra characters or formatting
+                if (entryDate.startsWith("'")) {
+                    entryDate = entryDate.substring(1);
+                }
+                
+                // Handle different date formats
+                let dateParts;
+                
+                if (entryDate.includes('.')) {
+                    // Austrian format DD.MM.YYYY
+                    dateParts = entryDate.split('.');
+                } else if (entryDate.includes('-')) {
+                    // ISO format YYYY-MM-DD
+                    const isoDate = new Date(entryDate);
+                    if (!isNaN(isoDate.getTime())) {
+                        dateParts = [
+                            String(isoDate.getDate()).padStart(2, '0'),
+                            String(isoDate.getMonth() + 1).padStart(2, '0'),
+                            String(isoDate.getFullYear())
+                        ];
+                    }
+                } else if (entryDate.includes('T') || entryDate.includes('Z')) {
+                    // Full ISO timestamp
+                    try {
+                        const isoDate = new Date(entryDate);
+                        if (!isNaN(isoDate.getTime())) {
+                            dateParts = [
+                                String(isoDate.getDate()).padStart(2, '0'),
+                                String(isoDate.getMonth() + 1).padStart(2, '0'),
+                                String(isoDate.getFullYear())
+                            ];
+                        }
+                    } catch (e) {
+                        console.log('Could not parse date:', entryDate);
+                        return false;
+                    }
+                }
+                
+                if (!dateParts || dateParts.length !== 3) {
+                    console.log('Invalid date format:', entryDate);
+                    return false;
+                }
+                
+                const entryMonth = dateParts[1];
+                const entryYear = dateParts[2];
+                
+                console.log(`Comparing entry date: ${entryDate} -> Month: ${entryMonth}, Year: ${entryYear} with filter Month: ${month}, Year: ${year}`);
+                
+                return entryMonth === month && entryYear === year;
             });
             
+            console.log(`Found ${monthEntries.length} entries for ${monthName} ${year}`);
+            
             if (monthEntries.length === 0) {
-                return `Keine Reiseaktivitäten für ${monthName} ${year} gefunden.`;
+                // Debug: Show what dates we found
+                const allDates = entries.map(e => e.date).filter(d => d);
+                console.log('All available dates:', allDates);
+                return `Keine Reiseaktivitäten für ${monthName} ${year} gefunden.\n\nVerfügbare Daten: ${allDates.join(', ')}`;
             }
             
             // Group entries by travel periods (consecutive dates or same project)
