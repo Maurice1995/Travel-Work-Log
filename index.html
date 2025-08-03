@@ -1215,17 +1215,20 @@
                 const startFormatted = formatDateWithWeekday(startDate);
                 const endFormatted = formatDateWithWeekday(endDate);
 
+                // Travel period header
                 if (period.startDate === period.endDate) {
-                    report += `**Reisezeitraum: ${startFormatted.toUpperCase()}**\n\n`;
+                    report += `REISEZEITRAUM: ${startFormatted.toUpperCase()}\n\n`;
                 } else {
-                    report += `**Reisezeitraum: ${startFormatted.toUpperCase()} – ${endFormatted.toUpperCase()}**\n\n`;
+                    report += `REISEZEITRAUM: ${startFormatted.toUpperCase()} – ${endFormatted.toUpperCase()}\n\n`;
                 }
 
                 const project = extractProjectInfo(period.entries);
                 const location = extractLocationInfo(period.entries);
                 const purpose = extractPurposeInfo(period.entries);
 
-                report += `**Projekt:** ${project} **Ort / Staat:** ${location} **Reisezweck:** ${purpose}\n\n`;
+                report += `Projekt: ${project}\n`;
+                report += `Ort / Staat: ${location}\n`;
+                report += `Reisezweck: ${purpose}\n\n`;
 
                 const travelStart = findTravelStart(period.entries);
                 const travelEnd = findTravelEnd(period.entries);
@@ -1233,14 +1236,14 @@
                 if (travelStart) {
                     const startDate = parseAustrianDate(travelStart.date);
                     if (startDate) {
-                        report += `• **Reisebeginn:** ${formatDateWithWeekday(startDate)}, ${travelStart.time} Uhr\n`;
+                        report += `• Reisebeginn: ${formatDateWithWeekday(startDate)}, ${travelStart.time} Uhr\n`;
                     }
                 }
 
                 if (travelEnd) {
                     const endDate = parseAustrianDate(travelEnd.date);
                     if (endDate) {
-                        report += `• **Reiseende:** ${formatDateWithWeekday(endDate)}, ${travelEnd.time} Uhr\n`;
+                        report += `• Reiseende: ${formatDateWithWeekday(endDate)}, ${travelEnd.time} Uhr\n`;
                     }
                 }
 
