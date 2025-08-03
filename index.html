@@ -954,8 +954,22 @@
                     location: formData.get('location')
                 };
 
+                console.log('=== HTML FORM DEBUG ===');
                 console.log('Form data being sent:', data);
-                console.log('Customer field value:', data.customer);
+                console.log('Customer field value:', `"${data.customer}"`);
+                console.log('Customer field type:', typeof data.customer);
+                console.log('Customer field length:', data.customer ? data.customer.length : 'null/undefined');
+                console.log('All form fields:');
+                for (let [key, value] of formData.entries()) {
+                    console.log(`  ${key}: "${value}"`);
+                }
+                console.log('=== END HTML DEBUG ===');
+
+                // Verify customer field is not empty
+                if (!data.customer || data.customer.trim() === '') {
+                    showMessage('Please fill in the Customer/Project field.', 'error');
+                    return;
+                }
 
                 await addToGoogleSheets(data);
                 showMessage('Entry added successfully!', 'success');
