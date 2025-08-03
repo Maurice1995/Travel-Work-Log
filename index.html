@@ -1182,7 +1182,7 @@
             }
         }
 
-        // Generate report content
+        // Generate report content - KORRIGIERTE VERSION
         function generateReportContent(entries, month, year, employeeName, monthName) {
             console.log('=== REPORT GENERATION START ===');
             console.log('Target month/year:', month, year);
@@ -1281,7 +1281,7 @@
                 return `Keine Reiseaktivitäten für ${monthName} ${year} gefunden.\n\nDebug - Verfügbare Daten (lokale Zeit):\n${debugInfo.join('\n')}\n\nSuchkriterium: Monat=${String(month).padStart(2, '0')}, Jahr=${String(year)}`;
             }
 
-            // Rest der Funktion bleibt gleich...
+            // Rest der Funktion
             const travelPeriods = groupIntoTravelPeriods(monthEntries);
             console.log('Travel periods:', travelPeriods);
 
@@ -1352,109 +1352,6 @@
             console.log(report);
             return report;
         }
-
-        console.log(`=== FILTER COMPLETE: Found ${monthEntries.length} matching entries ===`);
-        console.log('Matching entries:', monthEntries);
-
-        if (monthEntries.length === 0) {
-            // Debug: Show what dates we found and how they were parsed
-            const debugInfo = entries.map(e => {
-                if (!e.date) return 'No date';
-
-                let parsedInfo = '';
-                if (e.date.includes('T') || e.date.includes('Z')) {
-                    try {
-                        const isoDate = new Date(e.date);
-                        const month = String(isoDate.getMonth() + 1).padStart(2, '0');
-                        const year = String(isoDate.getFullYear());
-                        parsedInfo = ` (${month}/${year})`;
-                    } catch (err) {
-                        parsedInfo = ' (parse error)';
-                    }
-                } else if (e.date.includes('.')) {
-                    const parts = e.date.split('.');
-                    if (parts.length === 3) {
-                        parsedInfo = ` (${parts[1]}/${parts[2]})`;
-                    }
-                }
-
-                return e.date + parsedInfo;
-            }).filter(d => d);
-
-            return `Keine Reiseaktivitäten für ${monthName} ${year} gefunden.\n\nDebug - Verfügbare Daten:\n${debugInfo.join('\n')}\n\nSuchkriterium: Monat=${String(month).padStart(2, '0')}, Jahr=${String(year)}`;
-        }
-
-        // Group entries by travel periods (consecutive dates or same project)
-        const travelPeriods = groupIntoTravelPeriods(monthEntries);
-        console.log('Travel periods:', travelPeriods);
-
-        let report = `Reisekostenabrechnung ${monthName} ${year} für ${employeeName}\n\n`;
-
-        travelPeriods.forEach((period, index) => {
-            console.log(`Processing period ${index + 1}:`, period);
-
-            const startDate = parseAustrianDate(period.startDate);
-            const endDate = parseAustrianDate(period.endDate);
-
-            if (!startDate || !endDate) {
-                console.log('Could not parse dates for period:', period);
-                return;
-            }
-
-            // Format dates with weekdays
-            const startFormatted = formatDateWithWeekday(startDate);
-            const endFormatted = formatDateWithWeekday(endDate);
-
-            if (period.startDate === period.endDate) {
-                report += `**Reisezeitraum: ${startFormatted}**\n`;
-            } else {
-                report += `**Reisezeitraum: ${startFormatted} – ${endFormatted}**\n`;
-            }
-
-            // Try to determine project and location from entries
-            const project = extractProjectInfo(period.entries);
-            const location = extractLocationInfo(period.entries);
-            const purpose = extractPurposeInfo(period.entries);
-
-            report += `**Projekt:** ${project} **Ort / Staat:** ${location} **Reisezweck:** ${purpose}\n`;
-
-            // Find travel start and end times
-            const travelStart = findTravelStart(period.entries);
-            const travelEnd = findTravelEnd(period.entries);
-
-            if (travelStart) {
-                const startDate = parseAustrianDate(travelStart.date);
-                if (startDate) {
-                    let cleanTime = cleanTimeValue(travelStart.time);
-                    report += `* **Reisebeginn:** ${formatDateWithWeekday(startDate)}, ${cleanTime} Uhr\n`;
-                }
-            }
-
-            // Check for border crossings
-            const borderCrossings = findBorderCrossings(period.entries);
-            borderCrossings.forEach(crossing => {
-                const crossingDate = parseAustrianDate(crossing.date);
-                if (crossingDate) {
-                    let cleanTime = cleanTimeValue(crossing.time);
-                    report += `* **${crossing.type}:** ${formatDateWithWeekday(crossingDate)}, ${cleanTime} Uhr\n`;
-                }
-            });
-
-            if (travelEnd) {
-                const endDate = parseAustrianDate(travelEnd.date);
-                if (endDate) {
-                    let cleanTime = cleanTimeValue(travelEnd.time);
-                    report += `* **Reiseende:** ${formatDateWithWeekday(endDate)}, ${cleanTime} Uhr\n`;
-                }
-            }
-
-            report += '\n';
-        });
-
-        console.log('=== GENERATED REPORT ===');
-        console.log(report);
-        return report;
-    
 
         // Clean time values from various formats
         function cleanTimeValue(timeStr) {
