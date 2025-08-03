@@ -111,6 +111,148 @@
             background: white;
         }
 
+        /* Custom styling for time input */
+        input[type="time"] {
+            cursor: pointer;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 3px;
+        }
+
+        /* Custom date picker styles */
+        .date-picker-container {
+            position: relative;
+        }
+
+        .date-picker-container input {
+            padding-right: 50px;
+            font-family: monospace;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+
+        .date-picker-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+
+        .date-picker-btn:hover {
+            background-color: #f8f9fa;
+        }
+
+        .date-picker {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #4a90e2;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            margin-top: 5px;
+        }
+
+        .date-picker.show {
+            display: block;
+        }
+
+        .date-picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #4a90e2;
+            color: white;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .date-picker-header button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+
+        .date-picker-header button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .date-picker-header span {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .date-picker-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background: #f8f9fa;
+            padding: 10px 0;
+        }
+
+        .date-picker-weekdays span {
+            text-align: center;
+            font-weight: 600;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .date-picker-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            padding: 10px;
+            gap: 2px;
+        }
+
+        .date-picker-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .date-picker-day:hover {
+            background-color: #e3f2fd;
+        }
+
+        .date-picker-day.other-month {
+            color: #ccc;
+        }
+
+        .date-picker-day.today {
+            background-color: #fff3cd;
+            font-weight: 600;
+        }
+
+        .date-picker-day.selected {
+            background-color: #4a90e2;
+            color: white;
+            font-weight: 600;
+        }
+
         input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: #4a90e2;
@@ -285,11 +427,25 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="date">Date:</label>
-                            <input type="date" id="date" name="date" required>
+                            <div class="date-picker-container">
+                                <input type="text" id="date" name="date" placeholder="DD.MM.YYYY" readonly required>
+                                <button type="button" class="date-picker-btn" onclick="toggleDatePicker()">📅</button>
+                                <div id="date-picker" class="date-picker">
+                                    <div class="date-picker-header">
+                                        <button type="button" onclick="changeMonth(-1)">‹</button>
+                                        <span id="month-year"></span>
+                                        <button type="button" onclick="changeMonth(1)">›</button>
+                                    </div>
+                                    <div class="date-picker-weekdays">
+                                        <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
+                                    </div>
+                                    <div class="date-picker-days" id="date-picker-days"></div>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="time">Time:</label>
-                            <input type="time" id="time" name="time" required>
+                            <input type="time" id="time" name="time" step="300" required>
                         </div>
                     </div>
                     
@@ -395,18 +551,193 @@
         let SHEET_NAME = localStorage.getItem('sheetName') || 'Sheet1';
         let SCRIPT_URL = localStorage.getItem('scriptUrl') || '';
         
+        // Date picker variables
+        let currentDate = new Date();
+        let selectedDate = null;
+        let isDatePickerOpen = false;
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             // Set current date and time as defaults
             const now = new Date();
-            document.getElementById('date').value = now.toISOString().split('T')[0];
-            document.getElementById('time').value = now.toTimeString().split(' ')[0].substring(0, 5);
+            selectedDate = new Date(now);
+            document.getElementById('date').value = formatDateAustrian(now);
+            setCurrentTimeWith5MinuteStep();
+            
+            // Initialize date picker
+            updateDatePickerDisplay();
+            
+            // Close date picker when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.date-picker-container')) {
+                    closeDatePicker();
+                }
+            });
             
             // Load saved configuration
             document.getElementById('sheet-id').value = SHEET_ID;
             document.getElementById('sheet-name').value = SHEET_NAME;
             document.getElementById('script-url').value = SCRIPT_URL;
         });
+
+        // Format date in Austrian format (DD.MM.YYYY)
+        function formatDateAustrian(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}.${month}.${year}`;
+        }
+
+        // Parse Austrian date format to Date object
+        function parseAustrianDate(dateStr) {
+            const parts = dateStr.split('.');
+            if (parts.length !== 3) return null;
+            
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+            const year = parseInt(parts[2], 10);
+            
+            return new Date(year, month, day);
+        }
+
+        // Toggle date picker
+        function toggleDatePicker() {
+            const picker = document.getElementById('date-picker');
+            if (isDatePickerOpen) {
+                closeDatePicker();
+            } else {
+                picker.classList.add('show');
+                isDatePickerOpen = true;
+                updateDatePickerDisplay();
+            }
+        }
+
+        // Close date picker
+        function closeDatePicker() {
+            const picker = document.getElementById('date-picker');
+            picker.classList.remove('show');
+            isDatePickerOpen = false;
+        }
+
+        // Change month in date picker
+        function changeMonth(delta) {
+            currentDate.setMonth(currentDate.getMonth() + delta);
+            updateDatePickerDisplay();
+        }
+
+        // Update date picker display
+        function updateDatePickerDisplay() {
+            const monthNames = [
+                'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+                'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'
+            ];
+            
+            document.getElementById('month-year').textContent = 
+                `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            
+            generateCalendarDays();
+        }
+
+        // Generate calendar days
+        function generateCalendarDays() {
+            const daysContainer = document.getElementById('date-picker-days');
+            daysContainer.innerHTML = '';
+            
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            // First day of the month
+            const firstDay = new Date(year, month, 1);
+            // Last day of the month
+            const lastDay = new Date(year, month + 1, 0);
+            
+            // Get the day of week for first day (0 = Sunday, but we want Monday = 0)
+            let startDay = (firstDay.getDay() + 6) % 7; // Convert to Monday = 0
+            
+            // Add days from previous month
+            const prevMonth = new Date(year, month, 0);
+            for (let i = startDay - 1; i >= 0; i--) {
+                const day = prevMonth.getDate() - i;
+                const dayElement = createDayElement(day, 'other-month', new Date(year, month - 1, day));
+                daysContainer.appendChild(dayElement);
+            }
+            
+            // Add days of current month
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const date = new Date(year, month, day);
+                const dayElement = createDayElement(day, '', date);
+                daysContainer.appendChild(dayElement);
+            }
+            
+            // Add days from next month to fill the grid
+            const remainingDays = 42 - daysContainer.children.length; // 6 weeks * 7 days
+            for (let day = 1; day <= remainingDays; day++) {
+                const dayElement = createDayElement(day, 'other-month', new Date(year, month + 1, day));
+                daysContainer.appendChild(dayElement);
+            }
+        }
+
+        // Create day element
+        function createDayElement(day, className, date) {
+            const dayElement = document.createElement('div');
+            dayElement.className = `date-picker-day ${className}`;
+            dayElement.textContent = day;
+            
+            // Check if it's today
+            const today = new Date();
+            if (date.toDateString() === today.toDateString()) {
+                dayElement.classList.add('today');
+            }
+            
+            // Check if it's selected
+            if (selectedDate && date.toDateString() === selectedDate.toDateString()) {
+                dayElement.classList.add('selected');
+            }
+            
+            // Add click handler
+            dayElement.addEventListener('click', function() {
+                selectDate(date);
+            });
+            
+            return dayElement;
+        }
+
+        // Select date
+        function selectDate(date) {
+            selectedDate = new Date(date);
+            document.getElementById('date').value = formatDateAustrian(date);
+            
+            // Update current date to selected month if from different month
+            if (date.getMonth() !== currentDate.getMonth() || date.getFullYear() !== currentDate.getFullYear()) {
+                currentDate = new Date(date);
+                updateDatePickerDisplay();
+            } else {
+                // Just update the selected day
+                document.querySelectorAll('.date-picker-day').forEach(el => el.classList.remove('selected'));
+                event.target.classList.add('selected');
+            }
+            
+            closeDatePicker();
+        }
+
+        // Set current time rounded to nearest 5-minute interval
+        function setCurrentTimeWith5MinuteStep() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            
+            // Round to nearest 5-minute interval
+            minutes = Math.round(minutes / 5) * 5;
+            
+            // Handle overflow
+            if (minutes >= 60) {
+                minutes = 0;
+                hours = (hours + 1) % 24;
+            }
+            
+            const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+            document.getElementById('time').value = timeStr;
+        }
         
         // Tab switching
         function switchTab(tabName) {
@@ -452,8 +783,9 @@
             
             try {
                 const formData = new FormData(e.target);
+                
                 const data = {
-                    date: formData.get('date'),
+                    date: formData.get('date'), // Already in Austrian format DD.MM.YYYY
                     time: formData.get('time'),
                     activity: formData.get('activity'),
                     description: formData.get('description'),
@@ -466,12 +798,14 @@
                 
                 // Reset to current date/time
                 const now = new Date();
-                document.getElementById('date').value = now.toISOString().split('T')[0];
-                document.getElementById('time').value = now.toTimeString().split(' ')[0].substring(0, 5);
+                selectedDate = new Date(now);
+                document.getElementById('date').value = formatDateAustrian(now);
+                setCurrentTimeWith5MinuteStep();
+                updateDatePickerDisplay();
                 
             } catch (error) {
                 console.error('Error:', error);
-                showMessage('Failed to add entry. Please check your internet connection and Sheet configuration.', 'error');
+                showMessage(error.message || 'Failed to add entry. Please check your internet connection and Sheet configuration.', 'error');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
