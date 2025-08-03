@@ -974,37 +974,54 @@
             }
         });
 
-        // Add data to Google Sheets (demo version)
+        // Add data to Google Sheets
         async function addToGoogleSheets(data) {
             if (!SCRIPT_URL) {
                 throw new Error('Please configure your Google Apps Script URL in the Setup tab first.');
             }
 
-            // In this demo, we'll simulate the API call
-            console.log('Would send to Google Sheets:', data);
-            
-            // Simulate network delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // In real implementation, this would be:
-            /*
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: 'addEntry',
-                    sheetId: SHEET_ID,
-                    sheetName: SHEET_NAME,
-                    data: data
-                })
-            });
-            */
+            console.log('Sending data to Google Sheets:', data);
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'addEntry',
+                        sheetId: SHEET_ID,
+                        sheetName: SHEET_NAME,
+                        data: data
+                    })
+                });
+
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.text();
+                console.log('Response text:', result);
+
+                try {
+                    const jsonResult = JSON.parse(result);
+                    if (!jsonResult.success) {
+                        throw new Error(jsonResult.message || 'Failed to add entry');
+                    }
+                } catch (parseError) {
+                    console.log('Could not parse response as JSON, but request may have succeeded');
+                    // Sometimes Google Apps Script returns success even if we can't parse the response
+                }
+
+            } catch (error) {
+                console.error('Error details:', error);
+                throw new Error('Failed to add entry. Please check your Google Apps Script URL and Sheet configuration.');
+            }
         }
 
-        // Load entries from Google Sheets (demo version)
+        // Load entries from Google Sheets
         async function loadEntries() {
             if (!SHEET_ID) {
                 showMessage('Please configure your Google Sheets ID in the Setup tab first.', 'error');
@@ -1020,38 +1037,37 @@
             container.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px;">Loading entries...</p>';
 
             try {
-                // Demo data - in real implementation, this would fetch from Google Sheets
-                const demoEntries = [
-                    {
-                        date: '03.08.2025',
-                        time: '08:00',
-                        customer: 'BMW Group',
-                        activity: 'Travel - Departure',
-                        description: 'Leaving home driving to customer location',
-                        location: 'Home'
-                    },
-                    {
-                        date: '03.08.2025',
-                        time: '10:30',
-                        customer: 'BMW Group',
-                        activity: 'Work - Customer Location',
-                        description: 'Meeting with development team',
-                        location: 'BMW Office Munich'
-                    },
-                    {
-                        date: '02.08.2025',
-                        time: '16:00',
-                        customer: 'Siemens AG',
-                        activity: 'Travel - Arrival',
-                        description: 'Arrived at hotel',
-                        location: 'Hotel Marriott Berlin'
-                    }
-                ];
+                console.log('Loading entries from:', `${SCRIPT_URL}?action=getEntries&sheetId=${SHEET_ID}&sheetName=${SHEET_NAME}`);
+                
+                const response = await fetch(`${SCRIPT_URL}?action=getEntries&sheetId=${SHEET_ID}&sheetName=${SHEET_NAME}`);
+                
+                console.log('Load response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
 
-                displayEntries(demoEntries);
+                const responseText = await response.text();
+                console.log('Load response text:', responseText);
+
+                let entries;
+                try {
+                    entries = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('Failed to parse response:', parseError);
+                    throw new Error('Invalid response format from Google Apps Script');
+                }
+
+                if (Array.isArray(entries)) {
+                    displayEntries(entries);
+                } else if (entries.error) {
+                    throw new Error(entries.error);
+                } else {
+                    displayEntries([]);
+                }
             } catch (error) {
                 console.error('Error loading entries:', error);
-                container.innerHTML = '<p style="text-align: center; color: #dc3545; padding: 40px;">Failed to load entries. Please check your configuration and try again.</p>';
+                container.innerHTML = `<p style="text-align: center; color: #dc3545; padding: 40px;">Failed to load entries: ${error.message}<br>Please check your configuration and try again.</p>`;
             }
         }
 
