@@ -982,43 +982,22 @@
 
             console.log('Sending data to Google Sheets:', data);
 
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'addEntry',
-                        sheetId: SHEET_ID,
-                        sheetName: SHEET_NAME,
-                        data: data
-                    })
-                });
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Important for Google Apps Script
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: 'addEntry',
+                    sheetId: SHEET_ID,
+                    sheetName: SHEET_NAME,
+                    data: data
+                })
+            });
 
-                console.log('Response status:', response.status);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const result = await response.text();
-                console.log('Response text:', result);
-
-                try {
-                    const jsonResult = JSON.parse(result);
-                    if (!jsonResult.success) {
-                        throw new Error(jsonResult.message || 'Failed to add entry');
-                    }
-                } catch (parseError) {
-                    console.log('Could not parse response as JSON, but request may have succeeded');
-                    // Sometimes Google Apps Script returns success even if we can't parse the response
-                }
-
-            } catch (error) {
-                console.error('Error details:', error);
-                throw new Error('Failed to add entry. Please check your Google Apps Script URL and Sheet configuration.');
-            }
+            // Note: With no-cors mode, we can't check response status
+            // The script will assume success if no error is thrown
         }
 
         // Load entries from Google Sheets
